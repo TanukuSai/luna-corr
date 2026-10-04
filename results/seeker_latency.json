@@ -1,0 +1,12 @@
+{
+  "experiment_id": "EXP-IO",
+  "file_name": "ch2_ohr_ncp_20260716T1429432706_d_img_d18.img",
+  "file_size_gb": 1.05,
+  "window_size": "1024x1024",
+  "n_samples": 500,
+  "mean_latency_ms": 40.47,
+  "median_latency_ms": 39.15,
+  "p95_latency_ms": 55.06,
+  "min_latency_ms": 24.66,
+  "max_latency_ms": 73.64
+}

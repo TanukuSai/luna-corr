@@ -10,18 +10,26 @@ class GateDecision:
     accepted: bool
     status: str  # "ACCEPTED" or "ABSTAINED"
     reason_codes: List[str] = field(default_factory=list)
-    confidence_score: float = 0.0
+    confidence_score: float = 0.0  # Backward-compatible alias for uncalibrated_quality_score
+    uncalibrated_quality_score: float = 0.0
     metrics: Dict[str, Any] = field(default_factory=dict)
 
 class QualityGate:
     """
     Evaluates registration metrics against objective quality thresholds.
     Abstains if any criterion fails, preventing erroneous scientific alignments.
+
+    Operational Acceptance Thresholds:
+      - min_inliers: 20 (Unified with statistical reporting threshold N >= 20)
+      - min_inlier_ratio: 0.15 (15% consensus required)
+      - min_occupied_ratio: 0.30 (30% spatial grid coverage required)
+      - max_empty_circle: 0.45 (Max normalized empty radius)
+      - max_p95_residual_px: 4.0 px (Upper tolerance on P95 residual)
     """
 
     def __init__(
         self,
-        min_inliers: int = 15,
+        min_inliers: int = 20,
         min_inlier_ratio: float = 0.15,
         min_occupied_ratio: float = 0.30,
         max_empty_circle: float = 0.45,
@@ -61,17 +69,21 @@ class QualityGate:
 
         accepted = len(reasons) == 0
 
-        # Confidence composite score [0, 1]
+        # Uncalibrated Engineering Quality Composite Index [0, 1]
+        # Formula: 0.4 * min(1.0, N / 50.0) + 0.3 * occupied_ratio + 0.3 * max(0.0, 1.0 - p95 / max_p95)
+        # Note: This is an empirical composite score, NOT a calibrated Bayesian posterior probability.
         c_inl = min(1.0, inlier_count / 50.0)
         c_cov = occupied_ratio
         c_res = max(0.0, 1.0 - p95_residual_px / self.max_p95_residual_px)
         composite = float(0.4 * c_inl + 0.3 * c_cov + 0.3 * c_res) if accepted else 0.0
+        score = round(composite, 3)
 
         return GateDecision(
             accepted=accepted,
             status="ACCEPTED" if accepted else "ABSTAINED",
             reason_codes=reasons,
-            confidence_score=round(composite, 3),
+            confidence_score=score,
+            uncalibrated_quality_score=score,
             metrics={
                 "inlier_count": inlier_count,
                 "inlier_ratio": round(inlier_ratio, 3),

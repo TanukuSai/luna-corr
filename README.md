@@ -33,6 +33,7 @@ All reported metrics derive from frozen, executable benchmarks documented in [`B
 | **`EXP-TMC-FIXED`** | Chandrayaan-2 TMC-2 Stereo | Frozen $N=150$ evaluation set; zero-leakage training partition ($B=1000$ bootstrap) | Stage 1 (Raw SIFT): 2.119 px<br>Stage 3 (RootSIFT): 1.522 px<br>Stage 5 (Adaptive TPS): **0.841 px [0.711, 0.971]** (**44.7% gain**) | [`results/ablation_bootstrap_ci.json`](results/ablation_bootstrap_ci.json) |
 | **`EXP-NEG-DISJOINT`** | Apollo 11 mare vs South Pole | Non-overlapping pair negative control ($N < 20$ gating rule) | **1/1 Rejected** (5 candidate inliers; fails safely) | [`results/negative_control_disjoint/result.json`](results/negative_control_disjoint/result.json) |
 | **`EXP-SYN-ILLUM`** | LOLA South Pole DEM (~1 km GSD) | Sun azimuth sweep $0^\circ \to 180^\circ$ + sensor noise ($\sigma=0.01$) | Direct SIFT collapses at $\Delta\theta \ge 45^\circ$ ($N < 20$);<br>Mode C recovers **742–1,187 inliers**, **>99.1% precision @ 1px** | [`results/synthetic_illumination_groundtruth.json`](results/synthetic_illumination_groundtruth.json) |
+| **`EXP-IO`** | Chandrayaan-2 OHRC (1.05 GB raster) | 500 random $1024 \times 1024$ window seeks across 93,686 lines | **39.15 ms median** (40.47 ms mean, P95: 55.06 ms) | [`results/seeker_latency.json`](results/seeker_latency.json) |
 
 For comprehensive technical derivations, photogrammetry equations, and failure modes, see [`docs/SCIENTIFIC_REPORT.md`](docs/SCIENTIFIC_REPORT.md).
 
@@ -43,11 +44,11 @@ For comprehensive technical derivations, photogrammetry equations, and failure m
 ```
 [01 Ingest]       -> PDS4 XML label parsing, 16-bit array extraction, SPICE spatial overlap check
 [02 Appearance]   -> Local Contrast Normalization (LCN) + Mode C DEM reflectance simulation
-[03 Match]        -> Multi-scale RootSIFT / feature matching
+[03 Match]        -> Tiled coarse-to-fine RootSIFT feature matching
 [04 Geometry]     -> MAGSAC++ robust initial projective/homography fit
 [05 Spatial QC]   -> Soft-utility spatial quotas (prevents keypoint clustering on single crater rims)
 [06 Sub-pixel]    -> Phase-correlation sub-pixel refinement
-[07 Relief Gate]  -> Spatial autocorrelation (S_relief > 0.20) + P95 threshold -> triggers adaptive TPS
+[07 Relief Gate]  -> Spatial autocorrelation (S_relief > 0.20 AND P95 >= 1.5 px) -> triggers adaptive TPS
 [08 Decision]     -> Quality verification & metrics output, or explicit reason-coded ABSTAIN
 ```
 

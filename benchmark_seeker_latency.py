@@ -44,5 +44,25 @@ def run_latency_benchmark():
     print(f"Min / Max  : {np.min(times_ms):.2f} ms / {np.max(times_ms):.2f} ms")
     print("=" * 65)
 
+    import json
+    out_dir = Path("results")
+    out_dir.mkdir(exist_ok=True)
+    out_file = out_dir / "seeker_latency.json"
+    result_data = {
+        "experiment_id": "EXP-IO",
+        "file_name": img_path.name,
+        "file_size_gb": round(img_path.stat().st_size / (1024**3), 2),
+        "window_size": "1024x1024",
+        "n_samples": len(times_ms),
+        "mean_latency_ms": round(float(np.mean(times_ms)), 2),
+        "median_latency_ms": round(float(np.median(times_ms)), 2),
+        "p95_latency_ms": round(float(np.percentile(times_ms, 95)), 2),
+        "min_latency_ms": round(float(np.min(times_ms)), 2),
+        "max_latency_ms": round(float(np.max(times_ms)), 2)
+    }
+    with open(out_file, "w") as f:
+        json.dump(result_data, f, indent=2)
+    print(f"Artifact saved: {out_file}")
+
 if __name__ == "__main__":
     run_latency_benchmark()

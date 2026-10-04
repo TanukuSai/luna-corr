@@ -59,7 +59,7 @@ class LunarRegistrationPipeline:
         self.selector = selector or SoftSpatialUtilitySelector(grid_size=(8, 8), k_max_per_cell=15)
         self.refiner = refiner or SubPixelRefiner(method="PHASE_CORRELATION")
         self.adaptive_gate = adaptive_gate or AdaptiveDeformationGate(autocorr_threshold=0.20, min_p95_px=1.5)
-        self.gate = gate or QualityGate(min_inliers=15, min_inlier_ratio=0.15, max_p95_residual_px=4.0)
+        self.gate = gate or QualityGate(min_inliers=20, min_inlier_ratio=0.15, max_p95_residual_px=4.0)
         self.max_image_dim = max_image_dim
 
     def run(
@@ -233,7 +233,8 @@ class LunarRegistrationPipeline:
             "accepted": res.decision.accepted,
             "reason_codes": res.decision.reason_codes,
             "confidence_score": res.decision.confidence_score,
-            "quality_score": res.decision.confidence_score,
+            "quality_score": res.decision.uncalibrated_quality_score,
+            "uncalibrated_quality_score": res.decision.uncalibrated_quality_score,
             "runtime_s": round(res.runtime_s, 3),
             "metrics": res.decision.metrics,
             "transform_matrix": res.estimation.matrix.tolist() if res.estimation else None,
