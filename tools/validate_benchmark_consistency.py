@@ -348,13 +348,23 @@ def main():
                 else:
                     log_pass(f"No stale value '{stale}' in PPTX.")
 
-            # Check Mode C framing on Slide 3 (must clearly indicate physics branch, not default E2E stage)
-            slide3_text = slide_texts[2]
-            if "Mode C: Physics branch" in slide3_text or "Mode C: Physics Branch" in slide3_text or "Physics branch" in slide3_text:
-                log_pass("Slide 3 explicitly designates Mode C as Physics branch.")
-            else:
-                errors.append("Slide 3 does not designate Mode C as Physics branch.")
-                log_fail("Slide 3 Mode C framing incomplete.")
+            # Check SIH 2026 Explicit Pointer Structure per slide
+            sih_slide_pointers = [
+                (0, ["PROBLEM STATEMENT TITLE", "PROBLEM STATEMENT ID", "THEME", "PS CATEGORY", "TEAM ID", "REGISTERED TEAM NAME"], "Slide 1 (Title Page)"),
+                (1, ["IDEA TITLE", "PROPOSED SOLUTION", "HOW IT ADDRESSES THE PROBLEM", "INNOVATION & UNIQUENESS", "DETAILED EXPLANATION"], "Slide 2 (Idea Title & Proposed Solution)"),
+                (2, ["TECHNICAL APPROACH", "TECHNOLOGIES TO BE USED", "METHODOLOGY / PROCESS", "WORKING PROTOTYPE DELIVERABLES"], "Slide 3 (Technical Approach & Methodology)"),
+                (3, ["FEASIBILITY AND VIABILITY", "FEASIBILITY ANALYSIS", "CHALLENGES / RISKS", "MITIGATION STRATEGIES"], "Slide 4 (Feasibility & Viability)"),
+                (4, ["IMPACT AND BENEFITS", "TARGET AUDIENCE / USERS", "POTENTIAL IMPACT", "CATEGORIZED BENEFITS"], "Slide 5 (Impact & Benefits)"),
+                (5, ["RESEARCH AND REFERENCES", "RESEARCH BASIS & FOUNDATIONS", "REFERENCES & PROJECT LINKS", "SCIENTIFIC EVIDENCE BOUNDARY"], "Slide 6 (Research & References)"),
+            ]
+            for s_idx, required_pointers, slide_label in sih_slide_pointers:
+                s_text = slide_texts[s_idx].upper()
+                for ptr in required_pointers:
+                    if ptr in s_text:
+                        log_pass(f"{slide_label} contains required pointer: '{ptr}'")
+                    else:
+                        errors.append(f"{slide_label} missing required SIH pointer: '{ptr}'")
+                        log_fail(f"{slide_label} missing required pointer: '{ptr}'")
 
         except Exception as e:
             errors.append(f"Failed to inspect PPTX: {e}")
