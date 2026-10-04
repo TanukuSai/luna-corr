@@ -65,9 +65,9 @@ class TransitiveSensorLadder:
         # Normalize
         H_transitive /= (H_transitive[2, 2] + 1e-9)
 
-        composite_conf = out1.decision.confidence_score * out2.decision.confidence_score
+        composite_conf = out1.decision.quality_score * out2.decision.quality_score
 
-        print(f"[Sensor Ladder] Transitive Alignment Success! Combined Confidence: {composite_conf:.3f}")
+        print(f"[Sensor Ladder] Transitive Alignment Success! Combined Quality Score: {composite_conf:.3f}")
 
         return LadderRegistrationOutput(
             status="ACCEPTED",

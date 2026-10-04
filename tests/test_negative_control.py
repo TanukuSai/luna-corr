@@ -38,7 +38,7 @@ def test_negative_control_insufficient_inliers(gate):
     assert "LOW_INLIERS" in decision.reason_codes
     assert "LOW_COVERAGE" in decision.reason_codes
     assert decision.uncalibrated_quality_score == 0.0
-    assert decision.confidence_score == 0.0
+    assert decision.quality_score == 0.0
 
 def test_negative_control_low_consensus_ratio(gate):
     """Pair with many noisy matches but low inlier ratio (< 15%) must be rejected with LOW_INLIER_RATIO."""

@@ -13,6 +13,7 @@ import numpy as np
 import cv2
 
 from ..data.pds4_reader import PDS4Reader, LunarProduct
+from ..represent.preprocessor import RepresentationLayer
 from ..matchers.classical import SIFTMatcher, TiledMatcher
 from ..estimate.robust import RobustEstimator, EstimationResult
 from ..estimate.nonrigid import ElasticTransformer, NonRigidResult
@@ -52,9 +53,15 @@ class LunarRegistrationPipeline:
         refiner: Optional[SubPixelRefiner] = None,
         adaptive_gate: Optional[AdaptiveDeformationGate] = None,
         gate: Optional[QualityGate] = None,
-        max_image_dim: int = 2048
+        max_image_dim: int = 2048,
+        use_lcn: bool = True,
+        test_split_ratio: float = 0.20,
+        split_seed: int = 42
     ):
-        self.matcher = matcher or TiledMatcher(SIFTMatcher(n_features=6000, root_sift=True), tile_size=1024)
+        self.use_lcn = use_lcn
+        self.test_split_ratio = test_split_ratio
+        self.split_seed = split_seed
+        self.matcher = matcher or TiledMatcher(SIFTMatcher(n_features=6000, root_sift=True, use_local_norm=False), tile_size=1024)
         self.estimator = estimator or RobustEstimator(method="MAGSAC", reproj_threshold_px=3.0)
         self.selector = selector or SoftSpatialUtilitySelector(grid_size=(8, 8), k_max_per_cell=15)
         self.refiner = refiner or SubPixelRefiner(method="PHASE_CORRELATION")
@@ -70,17 +77,25 @@ class LunarRegistrationPipeline:
     ) -> RegistrationOutput:
         t0 = time.time()
         
-        # 1. Ingest
+        # 1. Ingest (PDS4 Product Loading)
         src_prod = PDS4Reader.load_product(source_path, max_dim=self.max_image_dim)
         ref_prod = PDS4Reader.load_product(reference_path, max_dim=self.max_image_dim)
 
         src_arr, ref_arr = src_prod.array, ref_prod.array
         src_m, ref_m = src_prod.mask, ref_prod.mask
 
-        # 2. Match
-        raw_matches = self.matcher.match(src_arr, ref_arr, src_m, ref_m)
+        # 2. Appearance Conditioning (Stage 2: Local Contrast Normalization)
+        if self.use_lcn:
+            src_norm = RepresentationLayer.local_contrast_normalization(src_arr, ksize=31)
+            ref_norm = RepresentationLayer.local_contrast_normalization(ref_arr, ksize=31)
+        else:
+            src_norm, ref_norm = src_arr, ref_arr
 
-        if raw_matches.is_empty:
+        # 3. Robust Correspondence Matching (Stage 3: Tiled RootSIFT)
+        raw_matches = self.matcher.match(src_norm, ref_norm, src_m, ref_m)
+        n_raw = len(raw_matches.src_points) if not raw_matches.is_empty else 0
+
+        if raw_matches.is_empty or n_raw < 4:
             decision = self.gate.evaluate(0, 0.0, 0.0, 1.0, 999.0)
             return RegistrationOutput(
                 source_id=src_prod.product_id, reference_id=ref_prod.product_id,
@@ -89,10 +104,32 @@ class LunarRegistrationPipeline:
                 warped_image=None, runtime_s=time.time() - t0, output_dir=output_dir
             )
 
-        # 3. Robust Estimation
-        est = self.estimator.estimate(raw_matches.src_points, raw_matches.ref_points, model_type="HOMOGRAPHY")
+        # 4. Zero-Leakage Candidate Partition (Train 80% / Test 20%)
+        # Strictly split candidate correspondences BEFORE initial geometric model fitting
+        if self.test_split_ratio > 0.0 and n_raw >= self.gate.min_inliers:
+            rng = np.random.default_rng(self.split_seed)
+            perm = rng.permutation(n_raw)
+            n_test = int(n_raw * self.test_split_ratio)
+            train_idx = perm[n_test:]
+            test_idx = perm[:n_test]
+
+            train_src = raw_matches.src_points[train_idx]
+            train_ref = raw_matches.ref_points[train_idx]
+            train_scores = raw_matches.scores[train_idx]
+
+            test_src = raw_matches.src_points[test_idx]
+            test_ref = raw_matches.ref_points[test_idx]
+        else:
+            train_src = raw_matches.src_points
+            train_ref = raw_matches.ref_points
+            train_scores = raw_matches.scores
+            test_src = np.empty((0, 2), dtype=np.float32)
+            test_ref = np.empty((0, 2), dtype=np.float32)
+
+        # 5. Robust Initial Geometric Estimation (TRAIN ONLY)
+        est = self.estimator.estimate(train_src, train_ref, model_type="HOMOGRAPHY")
         if est is None:
-            est = self.estimator.estimate(raw_matches.src_points, raw_matches.ref_points, model_type="AFFINE")
+            est = self.estimator.estimate(train_src, train_ref, model_type="AFFINE")
 
         if est is None:
             decision = self.gate.evaluate(0, 0.0, 0.0, 1.0, 999.0)
@@ -103,13 +140,13 @@ class LunarRegistrationPipeline:
                 warped_image=None, runtime_s=time.time() - t0, output_dir=output_dir
             )
 
-        # Inliers
-        inl_src = raw_matches.src_points[est.inlier_mask]
-        inl_ref = raw_matches.ref_points[est.inlier_mask]
-        inl_scores = raw_matches.scores[est.inlier_mask]
+        # Train inliers from initial projective estimate
+        inl_src = train_src[est.inlier_mask]
+        inl_ref = train_ref[est.inlier_mask]
+        inl_scores = train_scores[est.inlier_mask]
         inl_residuals = est.residuals
 
-        # 4. Soft Spatial Utility Selection
+        # 6. Soft Spatial Utility Selection (TRAIN ONLY)
         if hasattr(self.selector, "select") and "residuals" in self.selector.select.__code__.co_varnames:
             uni = self.selector.select(inl_src, inl_scores, inl_residuals, src_arr.shape)
         else:
@@ -119,34 +156,28 @@ class LunarRegistrationPipeline:
         sel_src = inl_src[sel_idx]
         sel_ref = inl_ref[sel_idx]
 
-        # 5. Sub-pixel Refinement
+        # 7. Sub-pixel Refinement (TRAIN ONLY)
         refined_ref, deltas, confs = self.refiner.refine_matches(src_arr, ref_arr, sel_src, sel_ref)
 
-        # 6. Independent Check-Point Split (80% Fit, 20% strictly withheld check points)
-        fit_src, fit_ref, check_src, check_ref = CheckpointEvaluator.split_points(
-            sel_src, refined_ref, inl_scores[sel_idx], fit_fraction=0.80, seed=42
-        )
-
-        # Calculate residual vectors of global homography on fit points EXCLUSIVELY
-        fit_src_h = np.hstack([fit_src, np.ones((len(fit_src), 1), dtype=np.float32)])
+        # Calculate residual vectors of initial projective estimate on refined train points
+        fit_src_h = np.hstack([sel_src, np.ones((len(sel_src), 1), dtype=np.float32)])
         pred_fit_h = (est.matrix @ fit_src_h.T).T
-        pred_fit = pred_fit_h[:, :2] / (pred_fit_h[:, 2:3] + 1e-9)
-        residual_vectors = fit_ref - pred_fit
+        pred_fit_h0 = pred_fit_h[:, :2] / (pred_fit_h[:, 2:3] + 1e-9)
+        residual_vectors = refined_ref - pred_fit_h0
         
-        # P95 residual evaluated strictly on the 80% fitting points (zero test set leakage)
         fit_res_norms = np.linalg.norm(residual_vectors, axis=1)
         fit_p95 = float(np.percentile(fit_res_norms, 95)) if len(fit_res_norms) > 0 else 0.0
 
-        # 7. Adaptive Model Selection Gate (Homography vs Elastic TPS)
-        adaptive_dec = self.adaptive_gate.analyze(fit_src, residual_vectors, fit_p95)
+        # 8. Adaptive Model Selection Gate (Homography vs Elastic TPS, TRAIN ONLY)
+        adaptive_dec = self.adaptive_gate.analyze(sel_src, residual_vectors, fit_p95)
 
         nonrigid_res = None
         elastic = ElasticTransformer(smoothing=0.5)
 
-        if adaptive_dec.selected_model == "TPS" and len(fit_src) >= 12:
-            nonrigid_res = elastic.fit(fit_src, fit_ref)
+        if adaptive_dec.selected_model == "TPS" and len(sel_src) >= 12:
+            nonrigid_res = elastic.fit(sel_src, refined_ref)
 
-        # Transform function for independent check-point evaluation
+        # Freeze Final Transform Function
         if nonrigid_res is not None and nonrigid_res.rbf_model is not None:
             def transform_func(pts):
                 return pts + nonrigid_res.rbf_model(pts)
@@ -156,23 +187,60 @@ class LunarRegistrationPipeline:
                 wh = (est.matrix @ pts_h.T).T
                 return wh[:, :2] / (wh[:, 2:3] + 1e-9)
 
-        # Evaluate on withheld independent check points
-        chk_eval = CheckpointEvaluator.evaluate(fit_src, fit_ref, check_src, check_ref, transform_func)
-
-        # Unbiased metric for scientific gate: check-point P95
-        eval_p95 = chk_eval.check_p95_px if not np.isnan(chk_eval.check_p95_px) else chk_eval.fit_p95_px
-
-        # 8. Quality Abstention Gate
+        # 9. Operational Quality Gate (Evaluated strictly on TRAIN data; zero test leakage)
         decision = self.gate.evaluate(
             inlier_count=len(sel_src),
             inlier_ratio=est.inlier_ratio,
             occupied_ratio=uni.occupied_ratio,
             largest_empty_circle=uni.largest_empty_circle,
-            p95_residual_px=eval_p95,
+            p95_residual_px=fit_p95,
             entropy=uni.entropy
         )
 
-        # 9. Warp Registered Product
+        # 10. Scientific Out-of-Sample Test Evaluation (Evaluated ONCE on frozen test partition)
+        if len(test_src) > 0:
+            pred_test_h = (est.matrix @ np.hstack([test_src, np.ones((len(test_src), 1), dtype=np.float32)]).T).T
+            pred_test_h0 = pred_test_h[:, :2] / (pred_test_h[:, 2:3] + 1e-9)
+            test_inl_mask = np.linalg.norm(test_ref - pred_test_h0, axis=1) <= self.estimator.reproj_threshold_px
+            test_inl_src = test_src[test_inl_mask]
+            test_inl_ref = test_ref[test_inl_mask]
+
+            if len(test_inl_src) > 0:
+                test_refined_ref, _, _ = self.refiner.refine_matches(src_arr, ref_arr, test_inl_src, test_inl_ref)
+                check_errors = np.linalg.norm(transform_func(test_inl_src) - test_refined_ref, axis=1)
+                check_rmse = float(np.sqrt(np.mean(check_errors ** 2)))
+                check_median = float(np.median(check_errors))
+                check_p95 = float(np.percentile(check_errors, 95))
+            else:
+                check_errors = np.empty((0,), dtype=np.float32)
+                check_rmse = float("nan")
+                check_median = float("nan")
+                check_p95 = float("nan")
+        else:
+            test_inl_src = np.empty((0, 2), dtype=np.float32)
+            check_errors = np.empty((0,), dtype=np.float32)
+            check_rmse = float("nan")
+            check_median = float("nan")
+            check_p95 = float("nan")
+
+        fit_errors = np.linalg.norm(transform_func(sel_src) - refined_ref, axis=1) if len(sel_src) > 0 else np.empty((0,))
+        fit_rmse = float(np.sqrt(np.mean(fit_errors ** 2))) if len(fit_errors) > 0 else float("nan")
+        fit_median = float(np.median(fit_errors)) if len(fit_errors) > 0 else float("nan")
+        fit_p95_final = float(np.percentile(fit_errors, 95)) if len(fit_errors) > 0 else float("nan")
+
+        chk_eval = CheckpointEvaluation(
+            n_fit_points=len(sel_src),
+            n_check_points=len(test_inl_src),
+            fit_rmse=fit_rmse,
+            fit_median_px=fit_median,
+            fit_p95_px=fit_p95_final,
+            check_rmse=check_rmse,
+            check_median_px=check_median,
+            check_p95_px=check_p95,
+            check_errors=check_errors
+        )
+
+        # 11. Warp Registered Product
         warped_img = None
         if decision.accepted:
             rh, rw = ref_arr.shape[:2]
@@ -224,7 +292,7 @@ class LunarRegistrationPipeline:
                 delta = res.refine_deltas[i] if i < len(res.refine_deltas) else 0.0
                 w.writerow([i, f"{row[0]:.3f}", f"{row[1]:.3f}", f"{row[2]:.3f}", f"{row[3]:.3f}", f"{delta:.3f}"])
 
-        # 2. result.json
+        # 2. result.json (clean quality_score only, zero confidence_score ambiguity)
         json_path = output_dir / "result.json"
         data = {
             "source_id": res.source_id,
@@ -232,7 +300,6 @@ class LunarRegistrationPipeline:
             "status": res.decision.status,
             "accepted": res.decision.accepted,
             "reason_codes": res.decision.reason_codes,
-            "confidence_score": res.decision.confidence_score,
             "quality_score": res.decision.uncalibrated_quality_score,
             "uncalibrated_quality_score": res.decision.uncalibrated_quality_score,
             "runtime_s": round(res.runtime_s, 3),
@@ -255,7 +322,7 @@ class LunarRegistrationPipeline:
                 "rmse": round(res.checkpoints.check_rmse, 3),
                 "median_error_px": round(res.checkpoints.check_median_px, 3),
                 "p95_error_px": round(res.checkpoints.check_p95_px, 3),
-                "evaluation_type": "20% withheld correspondences (not external geodetic ground truth)"
+                "evaluation_type": "20% withheld candidate split (zero geometric fitting or gate leakage)"
             } if res.checkpoints else None,
             "independent_ground_truth_control": None
         }

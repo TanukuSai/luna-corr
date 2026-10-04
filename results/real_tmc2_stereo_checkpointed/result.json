@@ -4,52 +4,52 @@
   "status": "ACCEPTED",
   "accepted": true,
   "reason_codes": [],
-  "confidence_score": 0.802,
-  "quality_score": 0.802,
-  "runtime_s": 1.082,
+  "quality_score": 0.742,
+  "uncalibrated_quality_score": 0.742,
+  "runtime_s": 1.075,
   "metrics": {
-    "inlier_count": 686,
-    "inlier_ratio": 0.77,
-    "occupied_ratio": 0.844,
+    "inlier_count": 660,
+    "inlier_ratio": 0.761,
+    "occupied_ratio": 0.812,
     "largest_empty_circle": 0.084,
-    "p95_residual_px": 2.01,
-    "entropy": 0.939
+    "p95_residual_px": 2.69,
+    "entropy": 0.933
   },
   "transform_matrix": [
     [
-      1.107660721339161,
-      -2.767476264597235e-05,
-      -5.8299359114738865
+      1.1080033052298528,
+      -0.00024399235446155693,
+      -5.533446175698555
     ],
     [
-      -0.03887222639559755,
-      1.0017617514698982,
-      262.9204918534568
+      -0.020755438841013822,
+      0.9994703242220393,
+      263.20005211464235
     ],
     [
-      -4.0363201851720275e-05,
-      2.0864650936084375e-06,
+      -4.309410590749367e-05,
+      1.0664168442325054e-06,
       1.0
     ]
   ],
   "adaptive_model_selection": {
     "chosen_model": "TPS",
-    "residual_spatial_coherence": 0.676,
-    "parallax_ratio": 0.637,
-    "reason": "Residuals exhibit spatial relief correlation (autocorr=0.68 > 0.2); triggering non-rigid TPS."
+    "residual_spatial_coherence": 0.725,
+    "parallax_ratio": 0.657,
+    "reason": "Residuals exhibit spatial relief correlation (autocorr=0.73 > 0.2) and P95 (2.69 px >= 1.5 px); triggering non-rigid TPS."
   },
   "fitting_correspondences_metrics": {
-    "n_points": 548,
-    "rmse": 0.841,
-    "median_error_px": 0.021,
-    "p95_error_px": 1.547
+    "n_points": 660,
+    "rmse": 0.647,
+    "median_error_px": 0.201,
+    "p95_error_px": 1.429
   },
   "heldout_validation_correspondences_metrics": {
-    "n_points": 138,
-    "rmse": 1.11,
-    "median_error_px": 0.689,
-    "p95_error_px": 2.012,
-    "evaluation_type": "20% withheld correspondences (not external geodetic ground truth)"
+    "n_points": 297,
+    "rmse": 1.073,
+    "median_error_px": 0.656,
+    "p95_error_px": 2.072,
+    "evaluation_type": "20% withheld candidate split (zero geometric fitting or gate leakage)"
   },
   "independent_ground_truth_control": null
 }

@@ -10,7 +10,7 @@ class GateDecision:
     accepted: bool
     status: str  # "ACCEPTED" or "ABSTAINED"
     reason_codes: List[str] = field(default_factory=list)
-    confidence_score: float = 0.0  # Backward-compatible alias for uncalibrated_quality_score
+    quality_score: float = 0.0
     uncalibrated_quality_score: float = 0.0
     metrics: Dict[str, Any] = field(default_factory=dict)
 
@@ -82,7 +82,7 @@ class QualityGate:
             accepted=accepted,
             status="ACCEPTED" if accepted else "ABSTAINED",
             reason_codes=reasons,
-            confidence_score=score,
+            quality_score=score,
             uncalibrated_quality_score=score,
             metrics={
                 "inlier_count": inlier_count,

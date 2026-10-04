@@ -69,15 +69,22 @@ def run_bootstrap_ablation():
         }
 
     # Helper to strictly filter out any training candidate within 3px of the withheld test set
-    def filter_disjoint_training(cand_s, cand_r, test_s, min_dist=3.0):
+    # Applied symmetrically in both source AND reference image coordinate frames
+    def filter_disjoint_training(cand_s, cand_r, test_s, test_r, min_dist=3.0):
         if len(cand_s) == 0:
             return cand_s, cand_r
-        # Compute min distance from each candidate source point to any test point
-        # Efficient distance check via broadcasting
-        diff = cand_s[:, np.newaxis, :] - test_s[np.newaxis, :, :] # (N_cand, N_test, 2)
-        dists = np.linalg.norm(diff, axis=2) # (N_cand, N_test)
-        min_dists = np.min(dists, axis=1) # (N_cand,)
-        disjoint_mask = min_dists > min_dist
+        # Compute min distance from each candidate to any test point in source space
+        diff_s = cand_s[:, np.newaxis, :] - test_s[np.newaxis, :, :] # (N_cand, N_test, 2)
+        dists_s = np.linalg.norm(diff_s, axis=2) # (N_cand, N_test)
+        min_dists_s = np.min(dists_s, axis=1) # (N_cand,)
+
+        # Compute min distance from each candidate to any test point in reference space
+        diff_r = cand_r[:, np.newaxis, :] - test_r[np.newaxis, :, :] # (N_cand, N_test, 2)
+        dists_r = np.linalg.norm(diff_r, axis=2) # (N_cand, N_test)
+        min_dists_r = np.min(dists_r, axis=1) # (N_cand,)
+
+        # Exclude candidate if it is within min_dist in EITHER source OR reference coordinate space
+        disjoint_mask = (min_dists_s > min_dist) & (min_dists_r > min_dist)
         return cand_s[disjoint_mask], cand_r[disjoint_mask]
 
     # 1. Raw SIFT (Strictly disjoint training set)
@@ -91,8 +98,8 @@ def run_bootstrap_ablation():
     good_raw = [m for m, n in m_raw if m.distance < 0.75 * n.distance]
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good_raw])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good_raw])
-    # Exclude test evaluation points from training fit
-    train_pts1, train_pts2 = filter_disjoint_training(pts1, pts2, fixed_eval_s, min_dist=3.0)
+    # Exclude test evaluation points from training fit (source OR ref space)
+    train_pts1, train_pts2 = filter_disjoint_training(pts1, pts2, fixed_eval_s, fixed_eval_r, min_dist=3.0)
     est1 = estimator.estimate(train_pts1, train_pts2, model_type="HOMOGRAPHY")
     def h1(pts):
         wh = (est1.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
@@ -108,16 +115,16 @@ def run_bootstrap_ablation():
     good_lcn = [m for m, n in m_lcn if m.distance < 0.75 * n.distance]
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good_lcn])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good_lcn])
-    # Exclude test evaluation points from training fit
-    train_pts1_lcn, train_pts2_lcn = filter_disjoint_training(pts1, pts2, fixed_eval_s, min_dist=3.0)
+    # Exclude test evaluation points from training fit (source OR ref space)
+    train_pts1_lcn, train_pts2_lcn = filter_disjoint_training(pts1, pts2, fixed_eval_s, fixed_eval_r, min_dist=3.0)
     est2 = estimator.estimate(train_pts1_lcn, train_pts2_lcn, model_type="HOMOGRAPHY")
     def h2(pts):
         wh = (est2.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs2 = np.linalg.norm(fixed_eval_r - h2(fixed_eval_s), axis=1)
 
-    # 3. + RootSIFT (Strictly disjoint training set, purging all candidates within 3.0 px of test points)
-    train_s_purged, train_r_purged = filter_disjoint_training(train_s, train_r, fixed_eval_s, min_dist=3.0)
+    # 3. + RootSIFT (Strictly disjoint training set, purging all candidates within 3.0 px of test points in source OR ref)
+    train_s_purged, train_r_purged = filter_disjoint_training(train_s, train_r, fixed_eval_s, fixed_eval_r, min_dist=3.0)
     est3 = estimator.estimate(train_s_purged, train_r_purged, model_type="HOMOGRAPHY")
     def h3(pts):
         wh = (est3.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T

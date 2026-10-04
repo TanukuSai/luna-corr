@@ -47,7 +47,7 @@ def main():
             print(f"Occupied Ratio   : {res.decision.metrics.get('occupied_ratio', 0):.2f}")
             print(f"Spatial Entropy  : {res.decision.metrics.get('entropy', 0):.2f}")
             print(f"P95 Error (px)   : {res.decision.metrics.get('p95_residual_px', 0):.2f}")
-            print(f"Confidence Score : {res.decision.confidence_score:.3f}")
+            print(f"Quality Score    : {res.decision.quality_score:.3f}")
             print(f"Deliverables     : Saved to {args.out}")
         else:
             print(f"Abstain Reasons  : {', '.join(res.decision.reason_codes)}")
