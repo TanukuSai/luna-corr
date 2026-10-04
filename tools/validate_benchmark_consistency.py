@@ -122,6 +122,19 @@ def main():
         assert abs(gain_vs_stg1 - 0.6054) < 1e-2, f"Gain vs Stage 1 {gain_vs_stg1:.3f} != 60.5%"
         log_pass("EXP-TMC-FIXED: Stage 1 (2.119 px) -> Stage 3 (1.606 px) -> Stage 5 (0.836 px [0.718, 0.973], 47.9% gain) confirmed.")
 
+    # 2.3b EXP-TMC-FIXED Study Results (Ablation Table Consistency)
+    ablation_study_path = root / "results/ablation_study_results.json"
+    if not ablation_study_path.exists():
+        errors.append(f"Artifact missing: {ablation_study_path}")
+        log_fail("ablation_study_results.json missing")
+    else:
+        with open(ablation_study_path, "r", encoding="utf-8") as f:
+            abl_study = json.load(f)
+        assert abs(abl_study[0]["fixed_eval_set"]["fixed_rmse_px"] - 2.119) < 1e-3
+        assert abs(abl_study[2]["fixed_eval_set"]["fixed_rmse_px"] - 1.606) < 1e-3
+        assert abs(abl_study[4]["fixed_eval_set"]["fixed_rmse_px"] - 0.836) < 1e-3
+        log_pass("ablation_study_results.json fixed evaluation metrics (2.119 -> 1.606 -> 0.836 px) fully verified.")
+
     # 2.4 EXP-NEG-DISJOINT
     neg_json_path = root / "results/negative_control_disjoint/result.json"
     if not neg_json_path.exists():
@@ -198,7 +211,8 @@ def main():
     assert adapt.autocorr_threshold == 0.20, f"AdaptiveDeformationGate threshold ({adapt.autocorr_threshold}) != 0.20"
     assert adapt.min_p95_px == 1.5, f"AdaptiveDeformationGate min_p95_px ({adapt.min_p95_px}) != 1.5"
     assert adapt.eps_zero == 0.05, f"AdaptiveDeformationGate eps_zero ({adapt.eps_zero}) != 0.05"
-    log_pass("AdaptiveDeformationGate thresholds (S_relief > 0.20, P95 >= 1.5 px, eps_zero = 0.05 px) confirmed.")
+    assert adapt.min_points == 20, f"AdaptiveDeformationGate min_points ({adapt.min_points}) != 20"
+    log_pass("AdaptiveDeformationGate thresholds (S_relief > 0.20, P95 >= 1.5 px, eps_zero = 0.05 px, min_points = 20) confirmed.")
 
     # -------------------------------------------------------------
     # 4. Text & Document Synchronization Audit

@@ -60,6 +60,7 @@ def run_ablation():
     
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good])
+    pts1_raw, pts2_raw = pts1.copy(), pts2.copy()
     
     est1 = estimator.estimate(pts1, pts2, model_type="HOMOGRAPHY")
     inl_src1 = pts1[est1.inlier_mask]
@@ -100,6 +101,7 @@ def run_ablation():
     
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good])
+    pts1_lcn, pts2_lcn = pts1.copy(), pts2.copy()
     
     est2 = estimator.estimate(pts1, pts2, model_type="HOMOGRAPHY")
     inl_src2 = pts1[est2.inlier_mask]
@@ -232,6 +234,16 @@ def run_ablation():
     train_s = inl_master_s[train_idx]
     train_r = inl_master_r[train_idx]
 
+    # Helper to strictly filter out any training candidate within 3px of the withheld test set
+    def filter_disjoint_training(cand_s, cand_r, test_s, min_dist=3.0):
+        if len(cand_s) == 0:
+            return cand_s, cand_r
+        diff = cand_s[:, np.newaxis, :] - test_s[np.newaxis, :, :]
+        dists = np.linalg.norm(diff, axis=2)
+        min_dists = np.min(dists, axis=1)
+        disjoint_mask = min_dists > min_dist
+        return cand_s[disjoint_mask], cand_r[disjoint_mask]
+
     def measure_fixed(trans_func):
         pred = trans_func(fixed_eval_s)
         errs = np.linalg.norm(fixed_eval_r - pred, axis=1)
@@ -242,16 +254,49 @@ def run_ablation():
             "fixed_p95_px": round(float(np.percentile(errs, 95)), 3)
         }
 
-    # Fixed metric 1: Raw SIFT
-    results[0]["fixed_eval_set"] = measure_fixed(h1_trans)
-    # Fixed metric 2: + LCN
-    results[1]["fixed_eval_set"] = measure_fixed(h2_trans)
-    # Fixed metric 3: + RootSIFT
-    results[2]["fixed_eval_set"] = measure_fixed(h3_trans)
-    # Fixed metric 4: + Soft Utility
-    results[3]["fixed_eval_set"] = measure_fixed(h4_trans)
-    # Fixed metric 5: + Adaptive TPS
-    results[4]["fixed_eval_set"] = measure_fixed(tps_trans)
+    # Fixed metric 1: Raw SIFT (fit on disjoint candidates)
+    f_s1, f_r1 = filter_disjoint_training(pts1_raw, pts2_raw, fixed_eval_s, min_dist=3.0)
+    est1_f = estimator.estimate(f_s1, f_r1, model_type="HOMOGRAPHY")
+    def h1_fixed(pts):
+        wh = (est1_f.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
+        return wh[:, :2] / (wh[:, 2:3] + 1e-9)
+    results[0]["fixed_eval_set"] = measure_fixed(h1_fixed)
+
+    # Fixed metric 2: + LCN (fit on disjoint candidates)
+    f_s2, f_r2 = filter_disjoint_training(pts1_lcn, pts2_lcn, fixed_eval_s, min_dist=3.0)
+    est2_f = estimator.estimate(f_s2, f_r2, model_type="HOMOGRAPHY")
+    def h2_fixed(pts):
+        wh = (est2_f.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
+        return wh[:, :2] / (wh[:, 2:3] + 1e-9)
+    results[1]["fixed_eval_set"] = measure_fixed(h2_fixed)
+
+    # Fixed metric 3: + RootSIFT (fit on disjoint consensus pool)
+    train_s_purged, train_r_purged = filter_disjoint_training(train_s, train_r, fixed_eval_s, min_dist=3.0)
+    est3_f = estimator.estimate(train_s_purged, train_r_purged, model_type="HOMOGRAPHY")
+    def h3_fixed(pts):
+        wh = (est3_f.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
+        return wh[:, :2] / (wh[:, 2:3] + 1e-9)
+    results[2]["fixed_eval_set"] = measure_fixed(h3_fixed)
+
+    # Fixed metric 4: + Soft Utility (selected strictly from purged consensus inliers)
+    train_s_inl = train_s_purged[est3_f.inlier_mask]
+    train_r_inl = train_r_purged[est3_f.inlier_mask]
+    selector_f = SoftSpatialUtilitySelector(grid_size=(8, 8), k_max_per_cell=15)
+    uni4_f = selector_f.select(train_s_inl, np.ones(len(train_s_inl)), est3_f.residuals, src_raw.shape)
+    sel_s_f = train_s_inl[uni4_f.selected_indices]
+    sel_r_f = train_r_inl[uni4_f.selected_indices]
+    est4_f = estimator.estimate(sel_s_f, sel_r_f, model_type="HOMOGRAPHY")
+    def h4_fixed(pts):
+        wh = (est4_f.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
+        return wh[:, :2] / (wh[:, 2:3] + 1e-9)
+    results[3]["fixed_eval_set"] = measure_fixed(h4_fixed)
+
+    # Fixed metric 5: + Adaptive TPS (fitted on purged, spatially uniform tie points)
+    elastic_f = ElasticTransformer(smoothing=0.5)
+    tps_res_f = elastic_f.fit(sel_s_f, sel_r_f)
+    def tps_fixed(pts):
+        return pts + tps_res_f.rbf_model(pts)
+    results[4]["fixed_eval_set"] = measure_fixed(tps_fixed)
 
     out_file = Path("results/ablation_study_results.json")
     out_file.parent.mkdir(parents=True, exist_ok=True)

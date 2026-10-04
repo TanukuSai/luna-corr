@@ -25,7 +25,7 @@ class AdaptiveDeformationGate:
         autocorr_threshold: float = 0.20,
         min_p95_px: float = 1.5,
         eps_zero: float = 0.05,
-        min_points: int = 15
+        min_points: int = 20
     ):
         self.autocorr_threshold = autocorr_threshold
         self.min_p95_px = min_p95_px
