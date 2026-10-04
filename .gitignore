@@ -19,3 +19,7 @@ env/
 .env
 .vscode/
 .idea/
+
+# Office temporary lock files & reference files
+~$*
+VAYU-TRACE*
