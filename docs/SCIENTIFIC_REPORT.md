@@ -47,11 +47,11 @@ Every capability claimed by the project is classified according to a strict 4-ti
 | **RootSIFT Hellinger Kernel** | **YELLOW** | Replaces Euclidean descriptor distance with L1-sqrt; provides an incremental **+6.7% inlier gain** (+68.6% cumulative over raw SIFT) on cratered terrain. | [`lunacorr/matchers/classical.py`](file:///c:/Projects/ISRO/lunacorr/matchers/classical.py) |
 | **Soft Spatial Utility Selection** | **GREEN** | Enforces $8 \times 8$ grid quotas while penalizing high-residual points; prunes clustered inliers from 1,098 to 529 while preserving global mapping accuracy. | [`lunacorr/selection/soft_utility.py`](file:///c:/Projects/ISRO/lunacorr/selection/soft_utility.py) |
 | **Adaptive Deformation Gate** | **YELLOW** | Automatically switches between Homography and TPS based on residual spatial coherence ($S_{\text{relief}} > 0.20$ AND P95 $\ge 1.5\text{ px}$) computed strictly on the fitting set; demonstrated on 2 test scenes, large-scale threshold validation pending. | [`lunacorr/estimate/adaptive_gate.py`](file:///c:/Projects/ISRO/lunacorr/estimate/adaptive_gate.py) |
-| **Empirical Relief Compensation (TPS)** | **YELLOW** | Thin-Plate Spline absorbs 2D relief-induced displacement on TMC-2 stereo, reducing held-out RMSE from $1.522\text{ px}$ to **$0.841\text{ px}$** (**44.7% improvement** vs Stage 3; **60.3%** vs Stage 1) on a fixed $N=150$ evaluation set (`EXP-TMC-FIXED`). | [`lunacorr/estimate/nonrigid.py`](file:///c:/Projects/ISRO/lunacorr/estimate/nonrigid.py)<br>[`results/ablation_bootstrap_ci.json`](file:///c:/Projects/ISRO/results/ablation_bootstrap_ci.json) |
-| **Synthetic Illumination Resilience** | **GREEN** | Mode C physics-based DEM re-illumination preserves **>99.1% Precision@1px** and abundant inliers ($742\text{--}1,187$) with $0.20\text{--}0.28\text{ px}$ RMSE across all solar azimuth disparities ($\Delta\theta \in [0^\circ, 180^\circ]$) on LOLA DEM simulations with Gaussian sensor noise ($\sigma=0.01$). | [`lunacorr/geometry/dem_renderer.py`](file:///c:/Projects/ISRO/lunacorr/geometry/dem_renderer.py)<br>[`results/synthetic_illumination_groundtruth.json`](file:///c:/Projects/ISRO/results/synthetic_illumination_groundtruth.json) |
+| **Empirical Relief Compensation (TPS)** | **YELLOW** | Thin-Plate Spline absorbs 2D relief-induced displacement on TMC-2 stereo, reducing held-out RMSE from $1.606\text{ px}$ to **$0.836\text{ px}$** (**47.9% improvement** vs Stage 3; **60.5%** vs Stage 1) on a fixed $N=150$ evaluation set (`EXP-TMC-FIXED`). | [`lunacorr/estimate/nonrigid.py`](file:///c:/Projects/ISRO/lunacorr/estimate/nonrigid.py)<br>[`results/ablation_bootstrap_ci.json`](file:///c:/Projects/ISRO/results/ablation_bootstrap_ci.json) |
+| **Synthetic Illumination Resilience** | **GREEN** | Mode C physics-based DEM re-illumination (experimental physics branch) preserves **>99.1% Precision@1px** and abundant inliers ($737\text{--}1,187$) with $0.20\text{--}0.28\text{ px}$ RMSE across all tested solar azimuth disparities ($\Delta\theta \in [0^\circ, 180^\circ]$) on LOLA DEM simulations with Gaussian sensor noise ($\sigma=0.01$). | [`lunacorr/geometry/dem_renderer.py`](file:///c:/Projects/ISRO/lunacorr/geometry/dem_renderer.py)<br>[`results/synthetic_illumination_groundtruth.json`](file:///c:/Projects/ISRO/results/synthetic_illumination_groundtruth.json) |
 | **Same-Sensor Repeat Registration** | **GREEN** | Registered 2 consecutive Chandrayaan-2 OHRC South Pole orbits (1 hr 58 min apart, `EXP-OHRC-E2E`) with **822 inliers**, $0.506\text{ px}$ held-out median error, and **$0.679\text{ px}$** held-out RMSE (P95: $1.294\text{ px}$, $N=165$ held-out). | [`results/real_ohrc_cross_orbit/result.json`](file:///c:/Projects/ISRO/results/real_ohrc_cross_orbit/result.json) |
-| **Negative Control (Abstention)** | **GREEN** | Tested on completely disjoint scenes (South Pole OHRC vs Equatorial TMC-2, `EXP-NEG-DISJOINT`); engine successfully **ABSTAINED** with reason codes `['LOW_INLIERS', 'LOW_COVERAGE']` and zero hallucinated registration. | [`results/negative_control_disjoint/result.json`](file:///c:/Projects/ISRO/results/negative_control_disjoint/result.json) |
-| **Sub-Pixel Accuracy (Tail Risk)** | **YELLOW** | **Qualified Claim:** Held-out median error ($0.478\text{--}0.689\text{ px}$) and RMSE ($0.679\text{--}0.841\text{ px}$ on OHRC and TMC-fixed) are sub-pixel, but tail distribution (**P95 = 1.29\text{--}2.01 px**) exceeds $1.0\text{ px}$ due to steep crater wall occlusions and relief displacement. | [`lunacorr/eval/checkpoints.py`](file:///c:/Projects/ISRO/lunacorr/eval/checkpoints.py)<br>[`BENCHMARK_MANIFEST.md`](file:///c:/Projects/ISRO/BENCHMARK_MANIFEST.md) |
+| **Negative Control (Abstention)** | **GREEN** | Tested on completely disjoint scenes (South Pole OHRC vs Equatorial TMC-2, `EXP-NEG-DISJOINT`); 1/1 tested pair rejected, engine successfully **ABSTAINED** with reason codes `['LOW_INLIERS', 'LOW_COVERAGE']` and zero hallucinated registration. | [`results/negative_control_disjoint/result.json`](file:///c:/Projects/ISRO/results/negative_control_disjoint/result.json) |
+| **Sub-Pixel Accuracy (Tail Risk)** | **YELLOW** | **Qualified Claim:** Held-out median error ($0.506\text{--}0.689\text{ px}$) and RMSE ($0.679\text{--}0.836\text{ px}$ on OHRC and TMC-fixed) are sub-pixel, but tail distribution (**P95 = 1.29\text{--}2.01 px**) exceeds $1.0\text{ px}$ due to steep crater wall occlusions and relief displacement. | [`lunacorr/eval/checkpoints.py`](file:///c:/Projects/ISRO/lunacorr/eval/checkpoints.py)<br>[`BENCHMARK_MANIFEST.md`](file:///c:/Projects/ISRO/BENCHMARK_MANIFEST.md) |
 | **Real Cross-Sensor Registration** | **ORANGE** | Transitive graph ladder ($T_{\text{OHRC}\to\text{IIRS}} = T_{\text{TMC-2}\to\text{IIRS}} \circ T_{\text{OHRC}\to\text{TMC-2}}$) is implemented, but PRADAN public sample footprints do not overlap (OHRC at South Pole, TMC-2 at mid-latitudes). | [`lunacorr/pipeline/ladder.py`](file:///c:/Projects/ISRO/lunacorr/pipeline/ladder.py) |
 | **Deep Feature Matching (CNN)** | **ORANGE** | PyTorch model and loss implemented; initial weights saved. Unverified against classical pipeline at mission scale. | [`lunacorr/models/correspondence_net.py`](file:///c:/Projects/ISRO/lunacorr/models/correspondence_net.py) |
 | **Independent Geodetic Ground Control** | **RED** | Current held-out evaluation uses withheld correspondences from the generator itself. Independent external ground-control points (tied to LOLA altimetry tracks) remain future work. | Future Work |
@@ -84,10 +84,10 @@ To prevent catastrophic misalignment, LUNA-CORR implements explicit failure cate
 | Failure Mode | Expected Physical Symptom | Quantitative Detection Criterion | Autonomous Pipeline Response |
 | :--- | :--- | :--- | :--- |
 | **Featureless Mare** | Low keypoint candidate density | $\text{Occupied Ratio} < 0.30$ | **`ABSTAIN`** (`LOW_COVERAGE`) |
-| **Disjoint Footprint** | Keypoints uncorrelated across scenes | $\text{Inliers} < 15 \text{ or } \text{Inlier Ratio} < 0.15$ | **`ABSTAIN`** (`LOW_INLIERS`, `LOW_INLIER_RATIO`) |
+| **Disjoint Footprint** | Keypoints uncorrelated across scenes | $\text{Inliers} < 20 \text{ or } \text{Inlier Ratio} < 0.15$ | **`ABSTAIN`** (`LOW_INLIERS`, `LOW_INLIER_RATIO`) |
 | **Topographic Relief Parallax** | Directionally coherent residual vectors | $S_{\text{relief}} > 0.20 \text{ and } \text{P95} > 1.5\text{ px}$ | **Trigger Adaptive Non-Rigid TPS** |
 | **Planar Terrain Overfitting** | Random, uncorrelated localization noise | $S_{\text{relief}} \le 0.20 \text{ or } \text{P95} \le 1.5\text{ px}$ | **Enforce Rigid Projective Homography** |
-| **Extreme Illumination Disparity** | Shadow migration, orthogonal gradients | SIFT inliers $< N_{\min}=20$ | **Trigger Mode C Physics-Based DEM Re-illumination** |
+| **Extreme Illumination Disparity** | Shadow migration, orthogonal gradients | SIFT inliers $< N_{\min}=20$ | **Trigger Mode C Physics-Based DEM Re-illumination (Experimental Physics Branch)** |
 | **Crater Wall Occlusion** | Non-monotone local relief folding | Tail error residual $\text{P95} > 4.0\text{ px}$ | **`ABSTAIN`** (`HIGH_RESIDUAL`) or local outlier masking |
 
 ---
@@ -95,21 +95,21 @@ To prevent catastrophic misalignment, LUNA-CORR implements explicit failure cate
 ## 4. Empirical Evaluation & Ablation Studies
 
 ### 4.1 Benchmark 1: Fixed Evaluation Set Ablation with 95% Bootstrap Confidence Intervals
-To eliminate evaluation population bias, a master set of **$N=150$ held-out correspondences** was frozen on the real Chandrayaan-2 TMC-2 stereo pair (`ch2_tmc_nra` vs `ch2_tmc_nrn`). Non-parametric bootstrap resampling ($B=1,000$ iterations) was executed to derive empirical 95% confidence intervals:
+To eliminate evaluation population bias, a master set of **$N=150$ held-out correspondences** was frozen on the real Chandrayaan-2 TMC-2 stereo pair (`ch2_tmc_nra` vs `ch2_tmc_nrn`). Non-parametric bootstrap resampling ($B=1,000$ iterations) was executed to derive empirical 95% confidence intervals, enforcing 3.0 px spatial exclusion of training candidates against the frozen test set across all stages:
 
 | Pipeline Stage | Fixed $N$ | Held-Out RMSE [95% CI] | Held-Out Median [95% CI] | Held-Out P95 [95% CI] | Accuracy Trajectory |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **Stage 1: Raw SIFT** | 150 | $2.119\text{ px}\ [1.829, 2.402]$ | $1.186\text{ px}\ [0.914, 1.335]$ | $5.384\text{ px}\ [3.279, 5.905]$ | Baseline rigid matching |
 | **Stage 2: + LCN** | 150 | $1.557\text{ px}\ [1.435, 1.667]$ | $1.353\text{ px}\ [1.038, 1.585]$ | $2.691\text{ px}\ [2.439, 2.807]$ | **26.5% RMSE reduction; 50.0% tail reduction** |
-| **Stage 3: + RootSIFT** | 150 | $1.522\text{ px}\ [1.392, 1.646]$ | $1.092\text{ px}\ [0.932, 1.357]$ | $2.831\text{ px}\ [2.445, 3.025]$ | Consistent homography mapping |
-| **Stage 4: + Soft Utility** | 150 | $1.522\text{ px}\ [1.383, 1.644]$ | $1.164\text{ px}\ [0.978, 1.332]$ | $2.804\text{ px}\ [2.498, 3.068]$ | Preserves accuracy while enforcing spatial uniformity |
-| **Stage 5: + Adaptive TPS** | 150 | **$0.841\text{ px}\ [0.711, 0.971]$** | **$0.478\text{ px}\ [0.424, 0.558]$** | **$1.829\text{ px}\ [1.272, 2.242]$** | **44.7% RMSE drop vs Stage 3; 60.3% vs Stage 1** |
+| **Stage 3: + RootSIFT** | 150 | $1.606\text{ px}\ [1.453, 1.760]$ | $1.041\text{ px}\ [0.852, 1.345]$ | $3.140\text{ px}\ [2.811, 3.370]$ | Consistent homography mapping (zero leakage) |
+| **Stage 4: + Soft Utility** | 150 | $1.617\text{ px}\ [1.466, 1.779]$ | $1.077\text{ px}\ [0.896, 1.277]$ | $3.228\text{ px}\ [2.892, 3.425]$ | Preserves accuracy while enforcing spatial uniformity |
+| **Stage 5: + Adaptive TPS** | 150 | **$0.836\text{ px}\ [0.718, 0.973]$** | **$0.560\text{ px}\ [0.497, 0.630]$** | **$1.537\text{ px}\ [1.217, 2.000]$** | **47.9% RMSE drop vs Stage 3; 60.5% vs Stage 1** |
 
 ```
 Key Statistical Finding:
 Non-parametric bootstrap resampling (B=1,000) demonstrates a substantial reduction across both mean and tail error distributions,
-driving the held-out RMSE from 2.119 px down to 0.841 px (95% CI: [0.711, 0.971] px).
-The median held-out error [0.424, 0.558] px is strictly sub-pixel across the 95% bootstrap interval.
+driving the held-out RMSE from 2.119 px down to 0.836 px (95% CI: [0.718, 0.973] px).
+The median held-out error [0.497, 0.630] px is strictly sub-pixel across the 95% bootstrap interval.
 Note: Formal statistical significance requires paired permutation or signed-rank tests; bootstrap intervals indicate strong separation.
 ```
 
@@ -145,7 +145,7 @@ In addition to the fixed $N=150$ ablation, the complete, unconstrained 8-stage p
 
 > [!IMPORTANT]
 > **Distinction Between EXP-TMC-FIXED and EXP-TMC-E2E:**
-> Reviewers must note that `EXP-TMC-FIXED` (held-out RMSE: **$0.841\text{ px}$**) and `EXP-TMC-E2E` (held-out RMSE: **$1.110\text{ px}$**) are two distinct experiments with different evaluation populations. `EXP-TMC-FIXED` measures the isolated contribution of each algorithmic stage on a frozen, pre-selected consensus set ($N=150$). `EXP-TMC-E2E` evaluates the entire autonomous pipeline without prior selection ($N=138$ random split from the live 686 inliers). The two numbers are mutually consistent and represent complementary evaluation protocols.
+> Reviewers must note that `EXP-TMC-FIXED` (held-out RMSE: **$0.836\text{ px}$**) and `EXP-TMC-E2E` (held-out RMSE: **$1.110\text{ px}$**) are two distinct experiments with different evaluation populations. `EXP-TMC-FIXED` measures the isolated contribution of each algorithmic stage on a frozen, pre-selected consensus set ($N=150$). `EXP-TMC-E2E` evaluates the entire autonomous pipeline without prior selection ($N=138$ random split from the live 686 inliers). The two numbers are mutually consistent and represent complementary evaluation protocols.
 
 ---
 
@@ -169,7 +169,7 @@ $$\text{Precision}_\tau = \frac{\#\{\text{predicted inliers with true error } < 
 Key Illumination Ground-Truth Findings:
 1. Direct Optical Matcher Collapse: At Delta_theta >= 45 deg, direct feature matching experiences catastrophic breakdown (0.0% Precision@1px at 45-60 deg, and complete inlier collapse to N < 20 at 90 deg and 180 deg) due to severe shadow inversion and contrast reversal.
 2. Suppression of Small-N Artifacts: Below N = 20 (e.g. 7 inliers at 90 deg, 10 inliers at 180 deg), metrics are explicitly suppressed to prevent misleading reporting.
-3. Controlled Photometric Normalization (Mode C): Re-illuminating the reference DEM under target illumination recovers 742 to 1,187 inliers with >99.1% Precision@1px and ~0.20-0.28 px RMSE even in the presence of sensor noise.
+3. Controlled Photometric Normalization (Mode C): Re-illuminating the reference DEM under target illumination recovers 737 to 1,187 inliers across the tested sweep (742 to 1,187 for non-zero disparities) with >99.1% Precision@1px and ~0.20-0.28 px RMSE even in the presence of sensor noise.
 4. Scientific Scope Boundary: This validates algorithmic and photometric rendering consistency under controlled synthetic conditions with known geometry. It is not presented as flight qualification on real planetary multi-phase imagery.
 ```
 

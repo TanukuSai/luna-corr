@@ -116,16 +116,17 @@ def run_bootstrap_ablation():
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs2 = np.linalg.norm(fixed_eval_r - h2(fixed_eval_s), axis=1)
 
-    # 3. + RootSIFT (Strictly disjoint training set)
-    est3 = estimator.estimate(train_s, train_r, model_type="HOMOGRAPHY")
+    # 3. + RootSIFT (Strictly disjoint training set, purging all candidates within 3.0 px of test points)
+    train_s_purged, train_r_purged = filter_disjoint_training(train_s, train_r, fixed_eval_s, min_dist=3.0)
+    est3 = estimator.estimate(train_s_purged, train_r_purged, model_type="HOMOGRAPHY")
     def h3(pts):
         wh = (est3.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs3 = np.linalg.norm(fixed_eval_r - h3(fixed_eval_s), axis=1)
 
-    # 4. + Soft Utility
-    train_s_inl = train_s[est3.inlier_mask]
-    train_r_inl = train_r[est3.inlier_mask]
+    # 4. + Soft Utility (Derived strictly from purged inlier pool)
+    train_s_inl = train_s_purged[est3.inlier_mask]
+    train_r_inl = train_r_purged[est3.inlier_mask]
     selector = SoftSpatialUtilitySelector(grid_size=(8, 8), k_max_per_cell=15)
     uni4 = selector.select(train_s_inl, np.ones(len(train_s_inl)), est3.residuals, src_raw.shape)
     sel_s = train_s_inl[uni4.selected_indices]
@@ -136,7 +137,7 @@ def run_bootstrap_ablation():
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs4 = np.linalg.norm(fixed_eval_r - h4(fixed_eval_s), axis=1)
 
-    # 5. + Adaptive TPS
+    # 5. + Adaptive TPS (Fitted strictly on purged, spatially uniform tie points)
     elastic = ElasticTransformer(smoothing=0.5)
     tps_res = elastic.fit(sel_s, sel_r)
     def tps_trans(pts):

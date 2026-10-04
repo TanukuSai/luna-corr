@@ -10,9 +10,9 @@ This manifest is the canonical scientific authority for all experimental results
 |---|---|---|---|---|---|---|---|
 | **`EXP-OHRC-E2E`** | End-to-end cross-orbit repeat registration | 20% random withheld correspondences (frozen split) | Chandrayaan-2 OHRC (`ch2_ohr_ncp_20260716t1429432706` vs `...1627551900`) | $N=165$ held-out ($N=657$ fit, 822 inliers, 99.2% ratio) | Held-out RMSE / Median / P95 | **0.679 px** RMSE (median: 0.506 px, P95: 1.294 px) | [`results/real_ohrc_cross_orbit/result.json`](results/real_ohrc_cross_orbit/result.json) |
 | **`EXP-TMC-E2E`** | End-to-end stereo triplet relief registration | 20% random withheld correspondences (frozen split) | Chandrayaan-2 TMC-2 Fore vs Nadir (`ch2_tmc_nra_...` vs `ch2_tmc_nrn_...`) | $N=138$ held-out ($N=548$ fit, 686 inliers, 77.0% ratio) | Held-out RMSE / Median / P95 | **1.110 px** RMSE (fitting: 0.841 px, median: 0.689 px, P95: 2.012 px) | [`results/real_tmc2_stereo_checkpointed/result.json`](results/real_tmc2_stereo_checkpointed/result.json) |
-| **`EXP-TMC-FIXED`** | Pipeline stage ablation & non-rigid gain | Fixed $N=150$ held-out set strictly withheld across all stages ($B=1000$ bootstrap) | Chandrayaan-2 TMC-2 Stereo | $N=150$ fixed held-out points | Held-out RMSE [95% CI] | Stage 1 (Raw SIFT): **2.119 px**<br>Stage 3 (RootSIFT): **1.522 px**<br>Stage 5 (TPS): **0.841 px** (**44.7% gain** vs Stage 3) | [`results/ablation_bootstrap_ci.json`](results/ablation_bootstrap_ci.json) |
-| **`EXP-NEG-DISJOINT`** | Fail-safe quality control & false-match rejection | Automated rejection threshold ($N < 20$ or spatial entropy $< 0.5$) | Disjoint lunar scenes (Apollo 11 mare vs South Pole crater) | 1 pair (5 candidate inliers retained, 0 accepted) | Acceptance decision | **REJECTED** (Reason: `INSUFFICIENT_INLIERS`, fails safely) | [`results/negative_control_disjoint/result.json`](results/negative_control_disjoint/result.json) |
-| **`EXP-SYN-ILLUM`** | Controlled photometric normalization under sun sweep | Known identity geometry + realistic sensor shot noise ($\sigma=0.01$) | NASA LOLA South Pole DEM (`ldac_50s_1000m.jp2`), $\Delta\text{Az} \in [0^\circ, 180^\circ]$ | Sweep of 7 sun angles | Precision@1px & Inlier yield | Direct SIFT: Collapses at $\Delta\theta \ge 45^\circ$ ($N < 20$, 0.0% prec)<br>Mode C: **742–1,187 inliers**, **>99.1% prec @ 1px** | [`results/synthetic_illumination_groundtruth.json`](results/synthetic_illumination_groundtruth.json) |
+| **`EXP-TMC-FIXED`** | Pipeline stage ablation & non-rigid gain | Fixed $N=150$ held-out set strictly withheld across all stages with 3 px spatial exclusion ($B=1000$ bootstrap) | Chandrayaan-2 TMC-2 Stereo | $N=150$ fixed held-out points | Held-out RMSE [95% CI] | Stage 1 (Raw SIFT): **2.119 px**<br>Stage 3 (RootSIFT): **1.606 px**<br>Stage 5 (TPS): **0.836 px** (**47.9% gain** vs Stage 3) | [`results/ablation_bootstrap_ci.json`](results/ablation_bootstrap_ci.json) |
+| **`EXP-NEG-DISJOINT`** | Fail-safe quality control & false-match rejection | Automated rejection threshold ($N < 20$ or spatial entropy $< 0.5$) | Disjoint lunar scenes (Apollo 11 mare vs South Pole crater) | 1 pair (5 candidate inliers retained, 0 accepted) | Acceptance decision | **REJECTED** (Reason: `LOW_INLIERS`, `LOW_COVERAGE`, fails safely) | [`results/negative_control_disjoint/result.json`](results/negative_control_disjoint/result.json) |
+| **`EXP-SYN-ILLUM`** | Controlled photometric normalization under sun sweep | Known identity geometry + realistic sensor shot noise ($\sigma=0.01$) | NASA LOLA South Pole DEM (`ldac_50s_1000m.jp2`), $\Delta\text{Az} \in [0^\circ, 180^\circ]$ | Sweep of 7 sun angles | Precision@1px & Inlier yield | Direct SIFT: Collapses at $\Delta\theta \ge 45^\circ$ ($N < 20$, 0.0% prec)<br>Mode C: **737–1,187 inliers**, **>99.1% prec @ 1px** | [`results/synthetic_illumination_groundtruth.json`](results/synthetic_illumination_groundtruth.json) |
 | **`EXP-IO`** | Windowed pyramid seeker latency on line-scan raster | 500 random $1024 \times 1024$ window reads across 93,686 lines | Chandrayaan-2 OHRC calibrated binary raster (`ch2_ohr_ncp_20260716T1429432706_d_img_d18.img`, 1.05 GB) | $N=500$ random seeks | Read Latency (ms) | **39.15 ms** median (**40.47 ms** mean, P95: 55.06 ms) | [`results/seeker_latency.json`](results/seeker_latency.json) |
 
 ---
@@ -41,20 +41,20 @@ This manifest is the canonical scientific authority for all experimental results
 - **Purpose**: Measure the incremental contribution of each algorithmic stage on an identical, strictly isolated set of $N=150$ evaluation points.
 - **Protocol**:
   - A fixed evaluation set of $N=150$ points was generated from consensus inliers and frozen (`seed=42`).
-  - **Zero Leakage Discipline**: For every stage (Stages 1 through 5), all candidate training points within a $3.0\text{ px}$ Euclidean radius of the $N=150$ test points were strictly excluded prior to model fitting.
+  - **Zero Leakage Discipline**: For every stage (Stages 1 through 5), all candidate training points within a $3.0\text{ px}$ Euclidean radius of the $N=150$ test points were strictly purged prior to model fitting.
   - Non-parametric bootstrap resampling ($B=1000$ iterations) was performed to estimate 95% confidence intervals.
 - **Results**:
   - Stage 1 (Raw SIFT): RMSE = 2.119 px [1.829, 2.402]
   - Stage 2 (+ LCN): RMSE = 1.557 px [1.435, 1.667]
-  - Stage 3 (+ RootSIFT): RMSE = 1.522 px [1.392, 1.646]
-  - Stage 4 (+ Soft Utility Quotas): RMSE = 1.522 px [1.383, 1.644]
-  - Stage 5 (+ Adaptive TPS): **0.841 px [0.711, 0.971]**
-- **Error Reduction**: **44.7% reduction** in held-out RMSE relative to Stage 3 rigid/projective baseline ($1.522 \to 0.841\text{ px}$); **60.3% reduction** relative to Raw SIFT ($2.119 \to 0.841\text{ px}$).
+  - Stage 3 (+ RootSIFT): RMSE = 1.606 px [1.453, 1.760]
+  - Stage 4 (+ Soft Utility Quotas): RMSE = 1.617 px [1.466, 1.779]
+  - Stage 5 (+ Adaptive TPS): **0.836 px [0.718, 0.973]**
+- **Error Reduction**: **47.9% reduction** in held-out RMSE relative to Stage 3 rigid/projective baseline ($1.606 \to 0.836\text{ px}$); **60.5% reduction** relative to Raw SIFT ($2.119 \to 0.836\text{ px}$).
 
 ### 4. `EXP-NEG-DISJOINT` (Disjoint Negative Control)
 - **Purpose**: Verify that the pipeline explicitly rejects non-overlapping scenes rather than hallucinating false alignments.
 - **Input**: Spatially disjoint scenes from different lunar hemispheres.
-- **Result**: Only 5 candidate matches detected ($N < 20$ gating threshold). Status: **REJECTED**, Reason: `INSUFFICIENT_INLIERS`. Fails safely.
+- **Result**: Only 5 candidate matches detected ($N < 20$ gating threshold). Status: **REJECTED**, Reason codes: `['LOW_INLIERS', 'LOW_COVERAGE']`. Fails safely. (Note: Validates that the engine rejects the tested non-overlapping pair; does not constitute a statistical population false-acceptance rate).
 
 ### 5. `EXP-SYN-ILLUM` (Controlled Photometric Normalization Benchmark)
 - **Input**: NASA LOLA South Pole DEM (`ldac_50s_1000m.jp2`, ~1 km GSD) rendered under varying solar azimuth $\theta_{\text{az}} \in [45^\circ, 225^\circ]$ ($\Delta\theta \in [0^\circ, 180^\circ]$) using the Lommel-Seeliger / Lunar-Lambert physical reflectance model with ray-traced shadows.
@@ -64,7 +64,8 @@ This manifest is the canonical scientific authority for all experimental results
   - At $\Delta\theta = 45^\circ$: Direct degrades to 28 inliers (0.0% precision @ 1px, 505 px RMSE); Mode C recovers **898 inliers** (99.3% precision @ 1px, 0.252 px RMSE).
   - At $\Delta\theta = 90^\circ$: Direct collapses to 7 inliers (suppressed); Mode C recovers **932 inliers** (99.1% precision @ 1px, 0.200 px RMSE).
   - At $\Delta\theta = 180^\circ$ (opposite sun): Direct collapses to 10 inliers (suppressed); Mode C recovers **742 inliers** (99.1% precision @ 1px, 0.279 px RMSE).
-- **Scientific Disclaimer**: Mode C re-illumination reconstructs the reference appearance under the target solar geometry when a baseline DEM is available. This validates the controlled photometric rendering mechanics; it does not substitute for real multi-phase flight validation.
+  - Full tested sweep yield: **737 to 1,187 inliers** across $0^\circ \to 180^\circ$ (742 to 1,187 for non-zero disparities).
+- **Scientific Disclaimer**: Mode C is an experimental physics-conditioning branch evaluated under controlled synthetic geometry. It reconstructs the reference appearance under target illumination when a baseline DEM is available; it does not substitute for real multi-phase flight validation.
 
 ### 6. `EXP-IO` (Windowed Push-Broom Line-Scan Seeker Latency)
 - **Input Data**: Unindexed Chandrayaan-2 OHRC calibrated binary image raster (`ch2_ohr_ncp_20260716T1429432706_d_img_d18.img`, 93,686 lines × 12,000 samples, 1.05 GB).

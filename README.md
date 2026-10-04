@@ -1,6 +1,6 @@
 # LUNA-CORR
 
-[![Tests](https://img.shields.io/badge/tests-5%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-15%20passed-brightgreen.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.14-blue.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Hackathon](https://img.shields.io/badge/SIH%202026-PS%2026166-teal.svg)]()
@@ -18,7 +18,7 @@ Lunar image correspondence is notoriously vulnerable to four fundamental physica
 3. **Relief Parallax**: 3D crater topography violates planar homography assumptions under varying orbital viewpoints.
 4. **Texture-Poor Mare**: Basaltic maria lack high-frequency visual textures.
 
-`LUNA-CORR` solves these challenges through an end-to-end, 8-stage pipeline combining **Local Contrast Normalization (LCN)**, **physics-conditioned DEM re-illumination (Mode C)**, **RootSIFT + MAGSAC++ robust geometric fitting**, **soft spatial utility quotas**, and an **autocorrelation-gated Thin-Plate Spline (TPS)** elastic deformation layer with explicit reason-coded abstention.
+`LUNA-CORR` solves these challenges through an end-to-end, 8-stage pipeline combining **Local Contrast Normalization (LCN)**, **RootSIFT + MAGSAC++ robust geometric fitting**, **soft spatial utility quotas**, and an **autocorrelation-gated Thin-Plate Spline (TPS)** elastic deformation layer with explicit reason-coded abstention, supplemented by an **experimental physics-based DEM re-illumination branch (Mode C)**.
 
 ---
 
@@ -30,9 +30,9 @@ All reported metrics derive from frozen, executable benchmarks documented in [`B
 |---|---|---|---|---|
 | **`EXP-OHRC-E2E`** | Chandrayaan-2 OHRC (~0.25 m GSD) | Cross-orbit repeat pair; 20% random held-out set ($N=165$) | **822 inliers (99.2%)**<br>**0.679 px held-out RMSE** (median: 0.506 px, P95: 1.294 px) | [`results/real_ohrc_cross_orbit/result.json`](results/real_ohrc_cross_orbit/result.json) |
 | **`EXP-TMC-E2E`** | Chandrayaan-2 TMC-2 (~5 m GSD) | Stereo triplet (fore vs nadir); 20% random held-out set ($N=138$) | **686 inliers (77.0%)**<br>**1.110 px held-out RMSE** (fitting: 0.841 px) | [`results/real_tmc2_stereo_checkpointed/result.json`](results/real_tmc2_stereo_checkpointed/result.json) |
-| **`EXP-TMC-FIXED`** | Chandrayaan-2 TMC-2 Stereo | Frozen $N=150$ evaluation set; zero-leakage training partition ($B=1000$ bootstrap) | Stage 1 (Raw SIFT): 2.119 px<br>Stage 3 (RootSIFT): 1.522 px<br>Stage 5 (Adaptive TPS): **0.841 px [0.711, 0.971]** (**44.7% gain**) | [`results/ablation_bootstrap_ci.json`](results/ablation_bootstrap_ci.json) |
+| **`EXP-TMC-FIXED`** | Chandrayaan-2 TMC-2 Stereo | Frozen $N=150$ evaluation set; zero-leakage 3 px spatial exclusion ($B=1000$ bootstrap) | Stage 1 (Raw SIFT): 2.119 px<br>Stage 3 (RootSIFT): 1.606 px<br>Stage 5 (Adaptive TPS): **0.836 px [0.718, 0.973]** (**47.9% gain**) | [`results/ablation_bootstrap_ci.json`](results/ablation_bootstrap_ci.json) |
 | **`EXP-NEG-DISJOINT`** | Apollo 11 mare vs South Pole | Non-overlapping pair negative control ($N < 20$ gating rule) | **1/1 Rejected** (5 candidate inliers; fails safely) | [`results/negative_control_disjoint/result.json`](results/negative_control_disjoint/result.json) |
-| **`EXP-SYN-ILLUM`** | LOLA South Pole DEM (~1 km GSD) | Sun azimuth sweep $0^\circ \to 180^\circ$ + sensor noise ($\sigma=0.01$) | Direct SIFT collapses at $\Delta\theta \ge 45^\circ$ ($N < 20$);<br>Mode C recovers **742–1,187 inliers**, **>99.1% precision @ 1px** | [`results/synthetic_illumination_groundtruth.json`](results/synthetic_illumination_groundtruth.json) |
+| **`EXP-SYN-ILLUM`** | LOLA South Pole DEM (~1 km GSD) | Sun azimuth sweep $0^\circ \to 180^\circ$ + sensor noise ($\sigma=0.01$) | Direct SIFT collapses at $\Delta\theta \ge 45^\circ$ ($N < 20$);<br>Mode C recovers **737–1,187 inliers**, **>99.1% precision @ 1px** | [`results/synthetic_illumination_groundtruth.json`](results/synthetic_illumination_groundtruth.json) |
 | **`EXP-IO`** | Chandrayaan-2 OHRC (1.05 GB raster) | 500 random $1024 \times 1024$ window seeks across 93,686 lines | **39.15 ms median** (40.47 ms mean, P95: 55.06 ms) | [`results/seeker_latency.json`](results/seeker_latency.json) |
 
 For comprehensive technical derivations, photogrammetry equations, and failure modes, see [`docs/SCIENTIFIC_REPORT.md`](docs/SCIENTIFIC_REPORT.md).
@@ -43,7 +43,7 @@ For comprehensive technical derivations, photogrammetry equations, and failure m
 
 ```
 [01 Ingest]       -> PDS4 XML label parsing, 16-bit array extraction, SPICE spatial overlap check
-[02 Appearance]   -> Local Contrast Normalization (LCN) + Mode C DEM reflectance simulation
+[02 Appearance]   -> Local Contrast Normalization (LCN) [Mode C DEM lighting: experimental physics branch]
 [03 Match]        -> Tiled coarse-to-fine RootSIFT feature matching
 [04 Geometry]     -> MAGSAC++ robust initial projective/homography fit
 [05 Spatial QC]   -> Soft-utility spatial quotas (prevents keypoint clustering on single crater rims)
@@ -126,7 +126,7 @@ luna-corr/
 ├── BENCHMARK_MANIFEST.md        <- Canonical experiment registry and metrics
 ├── Dockerfile                   <- Container definition
 ├── pyproject.toml               <- Python package configuration
-├── requirements.txt             <- Pinned dependencies
+├── requirements.txt             <- Core dependency specification
 ├── README.md                    <- Project documentation
 ├── LUNA-CORR_SIH2026_Presentation.pptx <- SIH 2026 Presentation
 ├── lunacorr/                    <- Core Python package
