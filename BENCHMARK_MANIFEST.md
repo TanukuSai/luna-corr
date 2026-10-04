@@ -40,7 +40,7 @@ This manifest is the canonical scientific authority for all experimental results
 ### 3. `EXP-TMC-FIXED` (Fixed Evaluation Set Ablation, $N=150$)
 - **Purpose**: Measure the incremental contribution of each algorithmic stage on an identical, strictly isolated set of $N=150$ evaluation points.
 - **Protocol**:
-  - A fixed evaluation set of $N=150$ points was generated from consensus inliers and frozen (`seed=42`).
+  - A frozen held-out consensus correspondence set of $N=150$ points was established (`seed=42`) (not independent geodetic ground truth).
   - **Zero Leakage Discipline**: For every stage (Stages 1 through 5), all candidate training points within a $3.0\text{ px}$ Euclidean radius of the $N=150$ test points were strictly purged prior to model fitting.
   - Non-parametric bootstrap resampling ($B=1000$ iterations) was performed to estimate 95% confidence intervals.
 - **Results**:
@@ -52,7 +52,7 @@ This manifest is the canonical scientific authority for all experimental results
 - **Error Reduction**: **47.9% reduction** in held-out RMSE relative to Stage 3 rigid/projective baseline ($1.606 \to 0.836\text{ px}$); **60.5% reduction** relative to Raw SIFT ($2.119 \to 0.836\text{ px}$).
 
 ### 4. `EXP-NEG-DISJOINT` (Disjoint Negative Control)
-- **Purpose**: Verify that the pipeline explicitly rejects non-overlapping scenes rather than hallucinating false alignments.
+- **Purpose**: Verify that the pipeline explicitly rejects non-overlapping scenes rather than accepting false alignments.
 - **Input**: Spatially disjoint scenes from different lunar hemispheres.
 - **Result**: Only 5 candidate matches detected ($N < 20$ gating threshold). Status: **REJECTED**, Reason codes: `['LOW_INLIERS', 'LOW_COVERAGE']`. Fails safely. (Note: Validates that the engine rejects the tested non-overlapping pair; does not constitute a statistical population false-acceptance rate).
 

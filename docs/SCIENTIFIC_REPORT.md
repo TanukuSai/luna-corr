@@ -50,7 +50,7 @@ Every capability claimed by the project is classified according to a strict 4-ti
 | **Empirical Relief Compensation (TPS)** | **YELLOW** | Thin-Plate Spline absorbs 2D relief-induced displacement on TMC-2 stereo, reducing held-out RMSE from $1.606\text{ px}$ to **$0.836\text{ px}$** (**47.9% improvement** vs Stage 3; **60.5%** vs Stage 1) on a fixed $N=150$ evaluation set (`EXP-TMC-FIXED`). | [`lunacorr/estimate/nonrigid.py`](file:///c:/Projects/ISRO/lunacorr/estimate/nonrigid.py)<br>[`results/ablation_bootstrap_ci.json`](file:///c:/Projects/ISRO/results/ablation_bootstrap_ci.json) |
 | **Synthetic Illumination Resilience** | **GREEN** | Mode C physics-based DEM re-illumination (experimental physics branch) preserves **>99.1% Precision@1px** and abundant inliers ($737\text{--}1,187$) with $0.20\text{--}0.28\text{ px}$ RMSE across all tested solar azimuth disparities ($\Delta\theta \in [0^\circ, 180^\circ]$) on LOLA DEM simulations with Gaussian sensor noise ($\sigma=0.01$). | [`lunacorr/geometry/dem_renderer.py`](file:///c:/Projects/ISRO/lunacorr/geometry/dem_renderer.py)<br>[`results/synthetic_illumination_groundtruth.json`](file:///c:/Projects/ISRO/results/synthetic_illumination_groundtruth.json) |
 | **Same-Sensor Repeat Registration** | **GREEN** | Registered 2 consecutive Chandrayaan-2 OHRC South Pole orbits (1 hr 58 min apart, `EXP-OHRC-E2E`) with **822 inliers**, $0.506\text{ px}$ held-out median error, and **$0.679\text{ px}$** held-out RMSE (P95: $1.294\text{ px}$, $N=165$ held-out). | [`results/real_ohrc_cross_orbit/result.json`](file:///c:/Projects/ISRO/results/real_ohrc_cross_orbit/result.json) |
-| **Negative Control (Abstention)** | **GREEN** | Tested on completely disjoint scenes (South Pole OHRC vs Equatorial TMC-2, `EXP-NEG-DISJOINT`); 1/1 tested pair rejected, engine successfully **ABSTAINED** with reason codes `['LOW_INLIERS', 'LOW_COVERAGE']` and zero hallucinated registration. | [`results/negative_control_disjoint/result.json`](file:///c:/Projects/ISRO/results/negative_control_disjoint/result.json) |
+| **Negative Control (Abstention)** | **GREEN** | Tested on completely disjoint scenes (South Pole OHRC vs Equatorial TMC-2, `EXP-NEG-DISJOINT`); 1/1 tested pair rejected, engine successfully **ABSTAINED** with reason codes `['LOW_INLIERS', 'LOW_COVERAGE']` without an accepted registration. | [`results/negative_control_disjoint/result.json`](file:///c:/Projects/ISRO/results/negative_control_disjoint/result.json) |
 | **Sub-Pixel Accuracy (Tail Risk)** | **YELLOW** | **Qualified Claim:** Held-out median error ($0.506\text{--}0.689\text{ px}$) and RMSE ($0.679\text{--}0.836\text{ px}$ on OHRC and TMC-fixed) are sub-pixel, but tail distribution (**P95 = 1.29\text{--}2.01 px**) exceeds $1.0\text{ px}$ due to steep crater wall occlusions and relief displacement. | [`lunacorr/eval/checkpoints.py`](file:///c:/Projects/ISRO/lunacorr/eval/checkpoints.py)<br>[`BENCHMARK_MANIFEST.md`](file:///c:/Projects/ISRO/BENCHMARK_MANIFEST.md) |
 | **Real Cross-Sensor Registration** | **ORANGE** | Transitive graph ladder ($T_{\text{OHRC}\to\text{IIRS}} = T_{\text{TMC-2}\to\text{IIRS}} \circ T_{\text{OHRC}\to\text{TMC-2}}$) is implemented, but PRADAN public sample footprints do not overlap (OHRC at South Pole, TMC-2 at mid-latitudes). | [`lunacorr/pipeline/ladder.py`](file:///c:/Projects/ISRO/lunacorr/pipeline/ladder.py) |
 | **Deep Feature Matching (CNN)** | **ORANGE** | PyTorch model and loss implemented; initial weights saved. Unverified against classical pipeline at mission scale. | [`lunacorr/models/correspondence_net.py`](file:///c:/Projects/ISRO/lunacorr/models/correspondence_net.py) |
@@ -95,7 +95,7 @@ To prevent catastrophic misalignment, LUNA-CORR implements explicit failure cate
 ## 4. Empirical Evaluation & Ablation Studies
 
 ### 4.1 Benchmark 1: Fixed Evaluation Set Ablation with 95% Bootstrap Confidence Intervals
-To eliminate evaluation population bias, a master set of **$N=150$ held-out correspondences** was frozen on the real Chandrayaan-2 TMC-2 stereo pair (`ch2_tmc_nra` vs `ch2_tmc_nrn`). Non-parametric bootstrap resampling ($B=1,000$ iterations) was executed to derive empirical 95% confidence intervals, enforcing 3.0 px spatial exclusion of training candidates against the frozen test set across all stages:
+To eliminate evaluation population bias, a master set of **$N=150$ held-out correspondences** was frozen on the real Chandrayaan-2 TMC-2 stereo pair (`ch2_tmc_nra` vs `ch2_tmc_nrn`). This evaluation benchmark is a **frozen held-out consensus correspondence set** (not an independent geodetic ground truth). Non-parametric bootstrap resampling ($B=1,000$ iterations) was executed to derive empirical 95% confidence intervals, enforcing 3.0 px spatial exclusion of training candidates against the frozen test set across all stages:
 
 | Pipeline Stage | Fixed $N$ | Held-Out RMSE [95% CI] | Held-Out Median [95% CI] | Held-Out P95 [95% CI] | Accuracy Trajectory |
 | :--- | :---: | :---: | :---: | :---: | :--- |
@@ -177,7 +177,7 @@ Key Illumination Ground-Truth Findings:
 
 ## 6. Negative Control Experiment (Abstention Verification)
 
-To prove that LUNA-CORR does not hallucinate false alignments on non-overlapping imagery, a negative control test was executed pairing two completely unrelated geographic regions:
+To test fail-safe rejection on a disjoint pair, a negative control test was executed pairing two completely unrelated geographic regions:
 * **Source Product:** South Pole OHRC (`ch2_ohr_ncp_20260716T1429432706_b_brw_d18`, Lat $-85^\circ\text{ S}$)
 * **Reference Product:** Equatorial TMC-2 (`ch2_tmc_nrn_20260815T2104543018_b_brw_d18`, Lat $+35^\circ\text{ N}$)
 
@@ -193,7 +193,7 @@ To prove that LUNA-CORR does not hallucinate false alignments on non-overlapping
   "registered_image_written": false
 }
 ```
-*Result:* The engine rejected alignment with zero hallucinated correspondences, demonstrating the integrity of the scientific quality gate.
+*Result:* The tested disjoint pair was rejected without an accepted registration (`['LOW_INLIERS', 'LOW_COVERAGE']`), demonstrating the integrity of the scientific quality gate.
 
 ---
 
@@ -204,7 +204,7 @@ In [`lunacorr/estimate/adaptive_gate.py`](file:///c:/Projects/ISRO/lunacorr/esti
 
 $$S_{\text{relief}} = \frac{1}{|K_\epsilon|} \sum_{i \in K_\epsilon} \left( \hat{\mathbf{r}}_i \cdot \hat{\mathbf{r}}_{\text{NN}(i)} \right)$$
 
-where $\mathbf{r}_i$ is the residual reprojection vector at fitting point $i$, $\text{NN}(i) = \arg\min_{j \neq i} \|\mathbf{p}_i - \mathbf{p}_j\|$ is its spatial nearest neighbor, and $K_\epsilon = \{i : \|\mathbf{r}_i\| \ge \epsilon\}$ is the subset of points with residuals above the measurement noise floor ($\epsilon = 0.1\text{ px}$). The normalized direction is defined as $\hat{\mathbf{r}}_i = \frac{\mathbf{r}_i}{\|\mathbf{r}_i\|}$.
+where $\mathbf{r}_i$ is the residual reprojection vector at fitting point $i$, $\text{NN}(i) = \arg\min_{j \neq i} \|\mathbf{p}_i - \mathbf{p}_j\|$ is its spatial nearest neighbor, and $K_\epsilon = \{i : \|\mathbf{r}_i\| \ge \epsilon\}$ is the subset of points with residuals above the measurement noise floor ($\epsilon = 0.05\text{ px}$). The normalized direction is defined as $\hat{\mathbf{r}}_i = \frac{\mathbf{r}_i}{\|\mathbf{r}_i\|}$.
 
 *On planar terrain with random feature localization noise, $\mathbb{E}[S_{\text{relief}}] \approx 0.00$. On stereo terrain with relief parallax, adjacent vectors align coherently ($S_{\text{relief}} = 0.676$). The default threshold of $0.20$ is substantially above the observed planar benchmark while reliably triggering on true stereo parallax.*
 

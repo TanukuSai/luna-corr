@@ -237,6 +237,17 @@ def main():
                 errors.append(f"docs/SCIENTIFIC_REPORT.md missing canonical value: {num}")
                 log_fail(f"Missing canonical value in report: {num}")
 
+        # Check NN-DRC epsilon in report matches code (0.05 px)
+        if r"\epsilon = 0.05" in report_text or "0.05 px" in report_text:
+            log_pass("docs/SCIENTIFIC_REPORT.md specifies NN-DRC epsilon = 0.05 px matching code.")
+        else:
+            errors.append("docs/SCIENTIFIC_REPORT.md missing epsilon = 0.05 px specification")
+            log_fail("docs/SCIENTIFIC_REPORT.md does not specify epsilon = 0.05 px")
+
+        if r"\epsilon = 0.1" in report_text or "epsilon = 0.10" in report_text:
+            errors.append("docs/SCIENTIFIC_REPORT.md contains stale epsilon = 0.1 px")
+            log_fail("docs/SCIENTIFIC_REPORT.md contains stale epsilon = 0.1 px")
+
     if readme_path.exists():
         readme_text = readme_path.read_text(encoding="utf-8")
         for stale in ["0.779", "0.812", "tests-5 passed", "Pinned dependencies"]:
