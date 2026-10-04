@@ -1,0 +1,55 @@
+{
+  "source_id": "ch2_ohr_ncp_20260716t1429432706_b_brw_d18",
+  "reference_id": "ch2_ohr_ncp_20260716t1627551900_b_brw_d18",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "reason_codes": [],
+  "confidence_score": 0.861,
+  "quality_score": 0.861,
+  "runtime_s": 2.493,
+  "metrics": {
+    "inlier_count": 822,
+    "inlier_ratio": 0.992,
+    "occupied_ratio": 0.859,
+    "largest_empty_circle": 0.137,
+    "p95_residual_px": 1.29,
+    "entropy": 0.963
+  },
+  "transform_matrix": [
+    [
+      1.007613543441406,
+      -0.01862266256979299,
+      5.8365201415667745
+    ],
+    [
+      0.048402941103804074,
+      1.0146433611135253,
+      149.06722626284605
+    ],
+    [
+      8.491245036381187e-06,
+      4.83723500435088e-06,
+      1.0
+    ]
+  ],
+  "adaptive_model_selection": {
+    "chosen_model": "TPS",
+    "residual_spatial_coherence": 0.498,
+    "parallax_ratio": 0.641,
+    "reason": "Residuals exhibit spatial relief correlation (autocorr=0.50 > 0.2); triggering non-rigid TPS."
+  },
+  "fitting_correspondences_metrics": {
+    "n_points": 657,
+    "rmse": 0.624,
+    "median_error_px": 0.256,
+    "p95_error_px": 1.355
+  },
+  "heldout_validation_correspondences_metrics": {
+    "n_points": 165,
+    "rmse": 0.679,
+    "median_error_px": 0.506,
+    "p95_error_px": 1.294,
+    "evaluation_type": "20% withheld correspondences (not external geodetic ground truth)"
+  },
+  "independent_ground_truth_control": null
+}

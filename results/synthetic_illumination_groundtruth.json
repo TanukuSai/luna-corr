@@ -1,0 +1,170 @@
+[
+  {
+    "delta_azimuth_deg": 0,
+    "target_azimuth_deg": 45.0,
+    "direct_optical": {
+      "inlier_count": 1669,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 1669,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 15,
+    "target_azimuth_deg": 60.0,
+    "direct_optical": {
+      "inlier_count": 288,
+      "status": "VALID",
+      "precision_at_05px": 0.8958333333333334,
+      "precision_at_10px": 0.9861111111111112,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.311332643032074,
+      "true_median_px": 0.14017213881015778,
+      "true_p95_px": 0.6002904176712036
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 2284,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 30,
+    "target_azimuth_deg": 75.0,
+    "direct_optical": {
+      "inlier_count": 73,
+      "status": "VALID",
+      "precision_at_05px": 0.684931506849315,
+      "precision_at_10px": 0.8356164383561644,
+      "precision_at_20px": 0.8904109589041096,
+      "true_rmse_px": 0.9606964588165283,
+      "true_median_px": 0.2787626385688782,
+      "true_p95_px": 2.450360059738159
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 2543,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 45,
+    "target_azimuth_deg": 90.0,
+    "direct_optical": {
+      "inlier_count": 32,
+      "status": "VALID",
+      "precision_at_05px": 0.40625,
+      "precision_at_10px": 0.6875,
+      "precision_at_20px": 0.875,
+      "true_rmse_px": 1.4802738428115845,
+      "true_median_px": 0.8300200700759888,
+      "true_p95_px": 3.623399019241333
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 2313,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 60,
+    "target_azimuth_deg": 105.0,
+    "direct_optical": {
+      "inlier_count": 14,
+      "status": "SUPPRESSED (N=14 < 20)",
+      "precision_at_05px": null,
+      "precision_at_10px": null,
+      "precision_at_20px": null,
+      "true_rmse_px": null,
+      "true_median_px": null,
+      "true_p95_px": null
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 2859,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 90,
+    "target_azimuth_deg": 135.0,
+    "direct_optical": {
+      "inlier_count": 6,
+      "status": "SUPPRESSED (N=6 < 20)",
+      "precision_at_05px": null,
+      "precision_at_10px": null,
+      "precision_at_20px": null,
+      "true_rmse_px": null,
+      "true_median_px": null,
+      "true_p95_px": null
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 2267,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 180,
+    "target_azimuth_deg": 225.0,
+    "direct_optical": {
+      "inlier_count": 15,
+      "status": "SUPPRESSED (N=15 < 20)",
+      "precision_at_05px": null,
+      "precision_at_10px": null,
+      "precision_at_20px": null,
+      "true_rmse_px": null,
+      "true_median_px": null,
+      "true_p95_px": null
+    },
+    "mode_c_reillumination": {
+      "inlier_count": 1679,
+      "status": "VALID",
+      "precision_at_05px": 1.0,
+      "precision_at_10px": 1.0,
+      "precision_at_20px": 1.0,
+      "true_rmse_px": 0.0,
+      "true_median_px": 0.0,
+      "true_p95_px": 0.0
+    }
+  }
+]

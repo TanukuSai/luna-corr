@@ -1,0 +1,92 @@
+[
+  {
+    "stage": "1. Raw SIFT",
+    "description": "Standard SIFT + L2 distance + MAGSAC++ (no LCN, no RootSIFT, no quota)",
+    "raw_matches": 969,
+    "inliers": 740,
+    "inlier_ratio": 0.764,
+    "check_points_n": 148,
+    "check_rmse_px": 1.435,
+    "check_median_px": 1.121,
+    "check_p95_px": 2.598,
+    "runtime_s": 0.169,
+    "fixed_eval_set": {
+      "fixed_n": 150,
+      "fixed_rmse_px": 1.902,
+      "fixed_median_px": 1.154,
+      "fixed_p95_px": 4.111
+    }
+  },
+  {
+    "stage": "2. + Local Contrast Norm",
+    "description": "LCN (kernel=31) + standard SIFT + MAGSAC++",
+    "raw_matches": 1449,
+    "inliers": 1170,
+    "inlier_ratio": 0.807,
+    "check_points_n": 234,
+    "check_rmse_px": 1.608,
+    "check_median_px": 1.249,
+    "check_p95_px": 2.794,
+    "runtime_s": 0.205,
+    "fixed_eval_set": {
+      "fixed_n": 150,
+      "fixed_rmse_px": 1.555,
+      "fixed_median_px": 1.353,
+      "fixed_p95_px": 2.701
+    }
+  },
+  {
+    "stage": "3. + RootSIFT",
+    "description": "LCN + RootSIFT (L1-sqrt) + MAGSAC++",
+    "raw_matches": 1573,
+    "inliers": 1248,
+    "inlier_ratio": 0.793,
+    "check_points_n": 250,
+    "check_rmse_px": 1.683,
+    "check_median_px": 1.494,
+    "check_p95_px": 2.776,
+    "runtime_s": 0.235,
+    "fixed_eval_set": {
+      "fixed_n": 150,
+      "fixed_rmse_px": 1.573,
+      "fixed_median_px": 1.302,
+      "fixed_p95_px": 2.746
+    }
+  },
+  {
+    "stage": "4. + Soft Utility Selection",
+    "description": "LCN + RootSIFT + Soft Utility (8x8 grid quotas, residual penalty)",
+    "raw_matches": 1573,
+    "inliers": 662,
+    "inlier_ratio": 0.793,
+    "check_points_n": 133,
+    "check_rmse_px": 1.316,
+    "check_median_px": 0.852,
+    "check_p95_px": 2.625,
+    "runtime_s": 0.23,
+    "fixed_eval_set": {
+      "fixed_n": 150,
+      "fixed_rmse_px": 1.573,
+      "fixed_median_px": 1.302,
+      "fixed_p95_px": 2.746
+    }
+  },
+  {
+    "stage": "5. + Adaptive TPS",
+    "description": "LCN + RootSIFT + Soft Utility + Thin-Plate Spline Elastic Warping",
+    "raw_matches": 1573,
+    "inliers": 662,
+    "inlier_ratio": 0.793,
+    "check_points_n": 133,
+    "check_rmse_px": 0.709,
+    "check_median_px": 0.492,
+    "check_p95_px": 1.374,
+    "runtime_s": 0.025,
+    "fixed_eval_set": {
+      "fixed_n": 150,
+      "fixed_rmse_px": 0.812,
+      "fixed_median_px": 0.449,
+      "fixed_p95_px": 1.691
+    }
+  }
+]

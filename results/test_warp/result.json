@@ -1,0 +1,34 @@
+{
+  "source_id": "src",
+  "reference_id": "ref",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "reason_codes": [],
+  "confidence_score": 0.922,
+  "runtime_s": 1.198,
+  "metrics": {
+    "inlier_count": 767,
+    "inlier_ratio": 0.998,
+    "occupied_ratio": 0.922,
+    "largest_empty_circle": 0.106,
+    "p95_residual_px": 0.73,
+    "entropy": 0.969
+  },
+  "transform_matrix": [
+    [
+      1.0144195538766072,
+      0.21482192699633726,
+      -188.58049762635892
+    ],
+    [
+      -0.19325191573771155,
+      1.0276652294898774,
+      67.42610016120739
+    ],
+    [
+      9.825697440614292e-05,
+      -7.833505888090254e-05,
+      1.0
+    ]
+  ]
+}

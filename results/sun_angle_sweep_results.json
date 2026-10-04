@@ -1,0 +1,121 @@
+[
+  {
+    "delta_azimuth_deg": 0,
+    "target_azimuth_deg": 45.0,
+    "direct_optical": {
+      "raw_matches": 1669,
+      "inliers": 1669,
+      "inlier_ratio": 1.0,
+      "rmse_px": 0.0,
+      "p95_error_px": 0.0,
+      "status": "ACCEPTED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 1669,
+      "rmse_px": 0.0,
+      "gain_factor": 1.0
+    }
+  },
+  {
+    "delta_azimuth_deg": 15,
+    "target_azimuth_deg": 60.0,
+    "direct_optical": {
+      "raw_matches": 431,
+      "inliers": 288,
+      "inlier_ratio": 0.668,
+      "rmse_px": 0.466,
+      "p95_error_px": 0.841,
+      "status": "ACCEPTED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 2284,
+      "rmse_px": 0.0,
+      "gain_factor": 7.9
+    }
+  },
+  {
+    "delta_azimuth_deg": 30,
+    "target_azimuth_deg": 75.0,
+    "direct_optical": {
+      "raw_matches": 227,
+      "inliers": 73,
+      "inlier_ratio": 0.322,
+      "rmse_px": 0.964,
+      "p95_error_px": 2.215,
+      "status": "ACCEPTED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 2543,
+      "rmse_px": 0.0,
+      "gain_factor": 34.8
+    }
+  },
+  {
+    "delta_azimuth_deg": 45,
+    "target_azimuth_deg": 90.0,
+    "direct_optical": {
+      "raw_matches": 184,
+      "inliers": 32,
+      "inlier_ratio": 0.174,
+      "rmse_px": 1.495,
+      "p95_error_px": 2.933,
+      "status": "ACCEPTED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 2313,
+      "rmse_px": 0.0,
+      "gain_factor": 72.3
+    }
+  },
+  {
+    "delta_azimuth_deg": 60,
+    "target_azimuth_deg": 105.0,
+    "direct_optical": {
+      "raw_matches": 133,
+      "inliers": 14,
+      "inlier_ratio": 0.105,
+      "rmse_px": 1.196,
+      "p95_error_px": 2.603,
+      "status": "COLLAPSED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 2859,
+      "rmse_px": 0.0,
+      "gain_factor": 204.2
+    }
+  },
+  {
+    "delta_azimuth_deg": 90,
+    "target_azimuth_deg": 135.0,
+    "direct_optical": {
+      "raw_matches": 45,
+      "inliers": 6,
+      "inlier_ratio": 0.133,
+      "rmse_px": 0.0,
+      "p95_error_px": 0.0,
+      "status": "COLLAPSED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 2267,
+      "rmse_px": 0.0,
+      "gain_factor": 377.8
+    }
+  },
+  {
+    "delta_azimuth_deg": 180,
+    "target_azimuth_deg": 225.0,
+    "direct_optical": {
+      "raw_matches": 78,
+      "inliers": 15,
+      "inlier_ratio": 0.192,
+      "rmse_px": 0.771,
+      "p95_error_px": 1.816,
+      "status": "ACCEPTED"
+    },
+    "mode_c_physics_rendering": {
+      "inliers": 1679,
+      "rmse_px": 0.0,
+      "gain_factor": 111.9
+    }
+  }
+]

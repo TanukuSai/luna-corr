@@ -1,0 +1,8 @@
+# Ignore all raw planetary data products, binary cubes, and large GeoTIFFs
+*
+!.gitignore
+!README.md
+!dem/
+!dem/**
+!lro_nac/
+!lro_nac/**

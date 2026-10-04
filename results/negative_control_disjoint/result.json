@@ -1,0 +1,58 @@
+{
+  "source_id": "ch2_ohr_ncp_20260716t1429432706_b_brw_d18",
+  "reference_id": "ch2_tmc_nrn_20260815t2104543018_b_brw_d18",
+  "status": "ABSTAINED",
+  "accepted": false,
+  "reason_codes": [
+    "LOW_INLIERS",
+    "LOW_COVERAGE"
+  ],
+  "confidence_score": 0.0,
+  "quality_score": 0.0,
+  "runtime_s": 0.795,
+  "metrics": {
+    "inlier_count": 5,
+    "inlier_ratio": 0.25,
+    "occupied_ratio": 0.047,
+    "largest_empty_circle": 0.344,
+    "p95_residual_px": 2.99,
+    "entropy": 0.254
+  },
+  "transform_matrix": [
+    [
+      0.33270083984655546,
+      0.02588193742623333,
+      -45.31847969437999
+    ],
+    [
+      -11.0012039922412,
+      -0.1727609084943235,
+      1613.2423243216451
+    ],
+    [
+      -0.0060059222614162605,
+      -0.0001688873189640768,
+      1.0
+    ]
+  ],
+  "adaptive_model_selection": {
+    "chosen_model": "HOMOGRAPHY",
+    "residual_spatial_coherence": 0.0,
+    "parallax_ratio": 0.0,
+    "reason": "Residual P95 (2.99 px) is within rigid planar tolerance (<1.5 px)."
+  },
+  "fitting_correspondences_metrics": {
+    "n_points": 5,
+    "rmse": 1.924,
+    "median_error_px": 0.806,
+    "p95_error_px": 2.991
+  },
+  "heldout_validation_correspondences_metrics": {
+    "n_points": 0,
+    "rmse": NaN,
+    "median_error_px": NaN,
+    "p95_error_px": NaN,
+    "evaluation_type": "20% withheld correspondences (not external geodetic ground truth)"
+  },
+  "independent_ground_truth_control": null
+}

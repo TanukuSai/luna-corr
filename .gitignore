@@ -1,0 +1,21 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Large temporary downloads
+pradan.issdc.gov.in/
+*.zip
+*.part
+*.tar.gz
+
+# Environment & local editor
+.venv/
+env/
+.env
+.vscode/
+.idea/

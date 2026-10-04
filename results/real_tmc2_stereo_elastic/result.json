@@ -1,0 +1,41 @@
+{
+  "source_id": "ch2_tmc_nra_20260815t2104543018_b_brw_d18",
+  "reference_id": "ch2_tmc_nrn_20260815t2104543018_b_brw_d18",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "reason_codes": [],
+  "confidence_score": 0.806,
+  "runtime_s": 1.119,
+  "metrics": {
+    "inlier_count": 710,
+    "inlier_ratio": 0.773,
+    "occupied_ratio": 0.844,
+    "largest_empty_circle": 0.087,
+    "p95_residual_px": 1.96,
+    "entropy": 0.943
+  },
+  "transform_matrix": [
+    [
+      1.1102327459782324,
+      -7.834746278478119e-05,
+      -6.021508920892151
+    ],
+    [
+      -0.047916559343755626,
+      0.997870486221457,
+      263.3677918697723
+    ],
+    [
+      -5.837761789128659e-05,
+      1.1329267720706737e-07,
+      1.0
+    ]
+  ],
+  "nonrigid_metrics": {
+    "warp_type": "TPS",
+    "control_points": 250,
+    "rmse": 0.887,
+    "median_error_px": 0.311,
+    "p95_error_px": 1.963
+  }
+}

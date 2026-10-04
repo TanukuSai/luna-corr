@@ -1,0 +1,124 @@
+PDS_VERSION_ID            = "PDS3"
+
+/*** This label describes a compressed image file, its corresponding XML    */
+/*** file, and map projection information.                                  */
+/*** The files described have the same name as this label but different     */
+/*** extensions. They are:                                                  */
+/***    .JP2 - A compressed image file corresponding to the uncompressed IMG*/
+/***           file, stored with JPEG2000 compression                       */
+/***    .XML - An auxiliary text file in XML, provided to aid display of    */
+/***           the JPEG2000 image with certain image processing software    */
+/*** The map projection information includes parameters that are specific   */
+/*** to this image. They are intended to be used with the general map       */
+/*** projection descriptions in the file indicated by the keyword           */
+/*** ^DATA_SET_MAP_PROJECTION. That file is found in the CATALOG directory  */
+/*** of this archive.                                                       */
+
+/*** GENERAL DATA DESCRIPTION PARAMETERS ***/
+
+PRODUCT_VERSION_ID        = "V1"
+DATA_SET_ID               = "LRO-L-LOLA-4-GDR-V1.0"
+PRODUCT_ID                = "LDAC_50S_1000M"
+INSTRUMENT_HOST_NAME      = "LUNAR RECONNAISSANCE ORBITER"
+INSTRUMENT_NAME           = "LUNAR ORBITER LASER ALTIMETER"
+INSTRUMENT_ID             = "LOLA"
+MISSION_PHASE_NAME        = "NOMINAL MISSION"
+TARGET_NAME               = MOON
+START_TIME                = 2009-09-15T21:52:46
+STOP_TIME                 = 2010-09-16T19:15:57
+PRODUCT_CREATION_TIME     = 2015-12-15
+PRODUCER_ID               = LRO_LOLA_TEAM
+PRODUCER_FULL_NAME        = "DAVID E. SMITH"
+PRODUCER_INSTITUTION_NAME = "GODDARD SPACE FLIGHT CENTER"
+DESCRIPTION               = "This data product is a map of data counts
+   corresponding to the gridded data product of the corresponding filename,
+   for the Moon at a resolution of 1000m/pix by 1000m/pix, true at the
+   pole in polar stereographic (spherical) projection.  It contains the number
+   of observations per pixel that have been used to produce the data products.
+   The LOLA Laser 1 data through the nominal mission phases are the primary 
+   source for this data set. 
+
+   This label describes two objects.  The first is a JP2 file of
+   the corresponding uncompressed .IMG file.  A jpeg 2000 compression
+   is used to render the image.  The second is an auxiliary xml file
+   that contains extensible markup language that is interpreted by
+   GDAL readers (www.gdal.org).
+"
+
+OBJECT                    = COMPRESSED_FILE
+  FILE_NAME                 = "LDAC_50S_1000M.JP2"
+  RECORD_TYPE               = UNDEFINED
+  FILE_RECORDS              = UNK
+  ENCODING_TYPE             = "JP2"
+  INTERCHANGE_FORMAT        = BINARY
+  UNCOMPRESSED_FILE_NAME    = "LDAC_50S_1000M.IMG"
+  REQUIRED_STORAGE_BYTES  = "12822048"
+  ^DESCRIPTION              = "JP2INFO.TXT"
+END_OBJECT                = COMPRESSED_FILE
+
+OBJECT                    = UNCOMPRESSED_FILE
+FILE_NAME                 = "LDAC_50S_1000M.IMG"
+RECORD_TYPE               = FIXED_LENGTH
+FILE_RECORDS              = 2532
+RECORD_BYTES              = 5064
+^IMAGE                    = "LDAC_50S_1000M.IMG"
+
+  OBJECT                  = IMAGE
+    NAME                  = COUNT
+    DESCRIPTION           = "Each sample represents a number corresponding
+      to the number of data points used to generate the polar gridded map
+      products for the corresponding, similarly named, LDEM file. "
+    LINES                 = 2532
+    LINE_SAMPLES          = 2532
+    MINIMUM               = 0
+    MAXIMUM               = 746
+    SAMPLE_TYPE           = LSB_INTEGER
+    SAMPLE_BITS           = 16
+    UNIT                  = "N/A"
+    SCALING_FACTOR        = 1
+    OFFSET                = 0
+
+  END_OBJECT              = IMAGE
+END_OBJECT                = UNCOMPRESSED_FILE
+
+OBJECT                    = AUX_FILE
+  FILE_NAME               = "LDAC_50S_1000M_AUX.XML"
+  RECORD_TYPE             = STREAM
+  FILE_RECORDS            = UNK
+  DESCRIPTION             = "This is an auxiliary file accompanying
+     the JPEG2000 file. It contains metadata in XML format that
+     is useful for displaying the image using a GDAL supported tool."
+END_OBJECT                = AUX_FILE
+
+OBJECT                    = IMAGE_MAP_PROJECTION
+ ^DATA_SET_MAP_PROJECTION     = "DSMAP_POLAR.CAT"
+ MAP_PROJECTION_TYPE          = "POLAR STEREOGRAPHIC"
+ KEYWORD_LATITUDE_TYPE        = "PLANETOCENTRIC"
+ MAP_RESOLUTION               = 30.3234 <pix/deg>
+ A_AXIS_RADIUS                = 1737.4 <km>
+ B_AXIS_RADIUS                = 1737.4 <km>
+ C_AXIS_RADIUS                = 1737.4 <km>
+ FIRST_STANDARD_PARALLEL      = 'N/A'
+ SECOND_STANDARD_PARALLEL     = 'N/A'
+ POSITIVE_LONGITUDE_DIRECTION = "EAST"
+ CENTER_LATITUDE              = -90 <deg>
+ CENTER_LONGITUDE             = 0 <deg>
+ REFERENCE_LATITUDE           = 'N/A'
+ REFERENCE_LONGITUDE          = 'N/A'
+ LINE_FIRST_PIXEL             = 1
+ LINE_LAST_PIXEL              = 2532
+ SAMPLE_FIRST_PIXEL           = 1
+ SAMPLE_LAST_PIXEL            = 2532
+ MAP_PROJECTION_ROTATION      = 0.0
+ MAP_SCALE                    = 1000 <m/pix>
+ MAXIMUM_LATITUDE             = -50 <deg>
+ MINIMUM_LATITUDE             = -90 <deg>
+ WESTERNMOST_LONGITUDE        = 'N/A'
+ EASTERNMOST_LONGITUDE        = 'N/A'
+ LINE_PROJECTION_OFFSET       = 1265.5 <pix>
+ SAMPLE_PROJECTION_OFFSET     = 1265.5 <pix>
+ COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
+ COORDINATE_SYSTEM_NAME       = "MEAN EARTH/POLAR AXIS OF DE421"
+END_OBJECT                    = IMAGE_MAP_PROJECTION
+
+END
