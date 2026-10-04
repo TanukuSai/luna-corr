@@ -68,7 +68,19 @@ def run_bootstrap_ablation():
                     round(float(np.percentile(boot_p95, 100 - alpha)), 3))
         }
 
-    # 1. Raw SIFT
+    # Helper to strictly filter out any training candidate within 3px of the withheld test set
+    def filter_disjoint_training(cand_s, cand_r, test_s, min_dist=3.0):
+        if len(cand_s) == 0:
+            return cand_s, cand_r
+        # Compute min distance from each candidate source point to any test point
+        # Efficient distance check via broadcasting
+        diff = cand_s[:, np.newaxis, :] - test_s[np.newaxis, :, :] # (N_cand, N_test, 2)
+        dists = np.linalg.norm(diff, axis=2) # (N_cand, N_test)
+        min_dists = np.min(dists, axis=1) # (N_cand,)
+        disjoint_mask = min_dists > min_dist
+        return cand_s[disjoint_mask], cand_r[disjoint_mask]
+
+    # 1. Raw SIFT (Strictly disjoint training set)
     sift_raw = cv2.SIFT_create(nfeatures=6000)
     u8_src = (np.clip(src_raw, 0, 1) * 255).astype(np.uint8)
     u8_ref = (np.clip(ref_raw, 0, 1) * 255).astype(np.uint8)
@@ -79,13 +91,15 @@ def run_bootstrap_ablation():
     good_raw = [m for m, n in m_raw if m.distance < 0.75 * n.distance]
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good_raw])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good_raw])
-    est1 = estimator.estimate(pts1, pts2, model_type="HOMOGRAPHY")
+    # Exclude test evaluation points from training fit
+    train_pts1, train_pts2 = filter_disjoint_training(pts1, pts2, fixed_eval_s, min_dist=3.0)
+    est1 = estimator.estimate(train_pts1, train_pts2, model_type="HOMOGRAPHY")
     def h1(pts):
         wh = (est1.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs1 = np.linalg.norm(fixed_eval_r - h1(fixed_eval_s), axis=1)
 
-    # 2. + LCN
+    # 2. + LCN (Strictly disjoint training set)
     u8_src_lcn = (np.clip(src_lcn, 0, 1) * 255).astype(np.uint8)
     u8_ref_lcn = (np.clip(ref_lcn, 0, 1) * 255).astype(np.uint8)
     kp1, des1 = sift_raw.detectAndCompute(u8_src_lcn, None)
@@ -94,13 +108,15 @@ def run_bootstrap_ablation():
     good_lcn = [m for m, n in m_lcn if m.distance < 0.75 * n.distance]
     pts1 = np.float32([kp1[m.queryIdx].pt for m in good_lcn])
     pts2 = np.float32([kp2[m.trainIdx].pt for m in good_lcn])
-    est2 = estimator.estimate(pts1, pts2, model_type="HOMOGRAPHY")
+    # Exclude test evaluation points from training fit
+    train_pts1_lcn, train_pts2_lcn = filter_disjoint_training(pts1, pts2, fixed_eval_s, min_dist=3.0)
+    est2 = estimator.estimate(train_pts1_lcn, train_pts2_lcn, model_type="HOMOGRAPHY")
     def h2(pts):
         wh = (est2.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T
         return wh[:, :2] / (wh[:, 2:3] + 1e-9)
     errs2 = np.linalg.norm(fixed_eval_r - h2(fixed_eval_s), axis=1)
 
-    # 3. + RootSIFT
+    # 3. + RootSIFT (Strictly disjoint training set)
     est3 = estimator.estimate(train_s, train_r, model_type="HOMOGRAPHY")
     def h3(pts):
         wh = (est3.matrix @ np.hstack([pts, np.ones((len(pts), 1), dtype=np.float32)]).T).T

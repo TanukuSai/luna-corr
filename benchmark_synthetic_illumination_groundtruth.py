@@ -1,10 +1,16 @@
 """
-Controlled Synthetic Illumination Ground-Truth Benchmark on LOLA South Pole DEM.
-Leverages the analytically known identity correspondence field (true_ref == src)
-under nadir viewing to measure:
-- True Precision @ tau (tau = 0.5 px, 1.0 px, 2.0 px)
-- True Displacement Error Distribution (Median, RMSE, P95)
-- Suppression of metrics when N < N_min (N_min = 20)
+Controlled Photometric Normalization Benchmark (EXP-SYN-ILLUM) on LOLA South Pole DEM.
+Evaluates the capability of physics-conditioned DEM re-illumination (Mode C)
+to recover correspondence against extreme sun-angle variation (0° to 180°).
+
+Methodological note:
+Under ideal synthetic re-illumination where the baseline DEM matches the scene topography,
+Mode C reconstructs the reference appearance under the target solar geometry, restoring
+correspondence yield from severe collapse (<20 inliers) to robust correspondence.
+An observation noise model (additive Gaussian sensor shot noise, sigma=0.01) is injected
+into the observed scene to test descriptor resilience beyond trivial identity comparison.
+This benchmark validates the controlled rendering and contrast recovery mechanics;
+it does NOT substitute for real-world uncalibrated multi-phase flight imagery.
 """
 from pathlib import Path
 import json
@@ -37,20 +43,26 @@ def run_synthetic_gt_benchmark():
     N_min = 20  # Explicitly frozen minimum sample size rule
 
     print("\n" + "=" * 115)
-    print("CONTROLLED ILLUMINATION GROUND-TRUTH BENCHMARK (LOLA DEM IDENTICAL GEOMETRY)")
-    print(f"Analytically Known Correspondence Field: Identity Mapping (x_ref* = x_src, y_ref* = y_src)")
+    print("CONTROLLED PHOTOMETRIC NORMALIZATION BENCHMARK (EXP-SYN-ILLUM: LOLA DEM SWEEP)")
+    print("Validates physics-conditioned rendering recovery; does NOT substitute for flight validation.")
     print("=" * 115)
     header = f"{'Delta Az':<9} | {'Direct N':<9} | {'Direct Prec@1px':<16} | {'Direct RMSE':<12} | {'Mode C N':<9} | {'Mode C Prec@1px':<16} | {'Mode C RMSE':<12}"
     print(header)
     print("-" * 115)
 
+    np.random.seed(42)
+
     for delta in delta_angles:
         target_az = (base_az + delta) % 360.0
-        src_optical = LunarDEMRenderer.render_lunar_lambert(
+        # Simulated target observation with sensor noise
+        src_clean = LunarDEMRenderer.render_lunar_lambert(
             dem_elevation_m=crop_dem, pixel_scale_m=1000.0,
             sun_azimuth_deg=target_az, sun_elevation_deg=base_el,
             cast_shadows=True
         )
+        # Add realistic sensor shot noise (SNR ~ 40 dB)
+        noise = np.random.normal(0, 0.01, src_clean.shape).astype(np.float32)
+        src_optical = np.clip(src_clean + noise, 0.0, 1.0)
 
         # 1. Direct Optical Matching
         m_dir = matcher.match(src_optical, ref_optical)

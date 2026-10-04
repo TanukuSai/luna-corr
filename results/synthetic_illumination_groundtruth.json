@@ -3,128 +3,128 @@
     "delta_azimuth_deg": 0,
     "target_azimuth_deg": 45.0,
     "direct_optical": {
-      "inlier_count": 1669,
+      "inlier_count": 737,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9864314789687924,
+      "precision_at_10px": 0.9932157394843962,
+      "precision_at_20px": 0.994572591587517,
+      "true_rmse_px": 0.25733911991119385,
+      "true_median_px": 0.06433131545782089,
+      "true_p95_px": 0.32357290387153625
     },
     "mode_c_reillumination": {
-      "inlier_count": 1669,
+      "inlier_count": 737,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9864314789687924,
+      "precision_at_10px": 0.9932157394843962,
+      "precision_at_20px": 0.994572591587517,
+      "true_rmse_px": 0.25733911991119385,
+      "true_median_px": 0.06433131545782089,
+      "true_p95_px": 0.32357290387153625
     }
   },
   {
     "delta_azimuth_deg": 15,
     "target_azimuth_deg": 60.0,
     "direct_optical": {
-      "inlier_count": 288,
+      "inlier_count": 243,
       "status": "VALID",
-      "precision_at_05px": 0.8958333333333334,
-      "precision_at_10px": 0.9861111111111112,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.311332643032074,
-      "true_median_px": 0.14017213881015778,
-      "true_p95_px": 0.6002904176712036
+      "precision_at_05px": 0.8847736625514403,
+      "precision_at_10px": 0.9876543209876543,
+      "precision_at_20px": 0.9917695473251029,
+      "true_rmse_px": 0.39821046590805054,
+      "true_median_px": 0.14564616978168488,
+      "true_p95_px": 0.6677088737487793
     },
     "mode_c_reillumination": {
-      "inlier_count": 2284,
+      "inlier_count": 890,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9696629213483146,
+      "precision_at_10px": 0.9921348314606742,
+      "precision_at_20px": 0.9943820224719101,
+      "true_rmse_px": 0.27568191289901733,
+      "true_median_px": 0.06759338825941086,
+      "true_p95_px": 0.3500615954399109
     }
   },
   {
     "delta_azimuth_deg": 30,
     "target_azimuth_deg": 75.0,
     "direct_optical": {
-      "inlier_count": 73,
+      "inlier_count": 65,
       "status": "VALID",
-      "precision_at_05px": 0.684931506849315,
-      "precision_at_10px": 0.8356164383561644,
-      "precision_at_20px": 0.8904109589041096,
-      "true_rmse_px": 0.9606964588165283,
-      "true_median_px": 0.2787626385688782,
-      "true_p95_px": 2.450360059738159
+      "precision_at_05px": 0.6,
+      "precision_at_10px": 0.8153846153846154,
+      "precision_at_20px": 0.9384615384615385,
+      "true_rmse_px": 1.1178386211395264,
+      "true_median_px": 0.3555518686771393,
+      "true_p95_px": 2.0239923000335693
     },
     "mode_c_reillumination": {
-      "inlier_count": 2543,
+      "inlier_count": 1031,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.98545101842871,
+      "precision_at_10px": 0.9932104752667313,
+      "precision_at_20px": 0.997090203685742,
+      "true_rmse_px": 0.22419986128807068,
+      "true_median_px": 0.0760093629360199,
+      "true_p95_px": 0.3101102113723755
     }
   },
   {
     "delta_azimuth_deg": 45,
     "target_azimuth_deg": 90.0,
     "direct_optical": {
-      "inlier_count": 32,
+      "inlier_count": 28,
       "status": "VALID",
-      "precision_at_05px": 0.40625,
-      "precision_at_10px": 0.6875,
-      "precision_at_20px": 0.875,
-      "true_rmse_px": 1.4802738428115845,
-      "true_median_px": 0.8300200700759888,
-      "true_p95_px": 3.623399019241333
+      "precision_at_05px": 0.0,
+      "precision_at_10px": 0.0,
+      "precision_at_20px": 0.0,
+      "true_rmse_px": 505.3074035644531,
+      "true_median_px": 246.5546875,
+      "true_p95_px": 826.9113159179688
     },
     "mode_c_reillumination": {
-      "inlier_count": 2313,
+      "inlier_count": 898,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9810690423162584,
+      "precision_at_10px": 0.9933184855233853,
+      "precision_at_20px": 0.9933184855233853,
+      "true_rmse_px": 0.25162073969841003,
+      "true_median_px": 0.06609673798084259,
+      "true_p95_px": 0.2702391445636749
     }
   },
   {
     "delta_azimuth_deg": 60,
     "target_azimuth_deg": 105.0,
     "direct_optical": {
-      "inlier_count": 14,
-      "status": "SUPPRESSED (N=14 < 20)",
-      "precision_at_05px": null,
-      "precision_at_10px": null,
-      "precision_at_20px": null,
-      "true_rmse_px": null,
-      "true_median_px": null,
-      "true_p95_px": null
+      "inlier_count": 23,
+      "status": "VALID",
+      "precision_at_05px": 0.0,
+      "precision_at_10px": 0.0,
+      "precision_at_20px": 0.0,
+      "true_rmse_px": 554.0300903320312,
+      "true_median_px": 516.853515625,
+      "true_p95_px": 892.3969116210938
     },
     "mode_c_reillumination": {
-      "inlier_count": 2859,
+      "inlier_count": 1187,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9780960404380792,
+      "precision_at_10px": 0.9941027801179444,
+      "precision_at_20px": 0.9966301600673968,
+      "true_rmse_px": 0.2283158302307129,
+      "true_median_px": 0.0731852576136589,
+      "true_p95_px": 0.33655351400375366
     }
   },
   {
     "delta_azimuth_deg": 90,
     "target_azimuth_deg": 135.0,
     "direct_optical": {
-      "inlier_count": 6,
-      "status": "SUPPRESSED (N=6 < 20)",
+      "inlier_count": 7,
+      "status": "SUPPRESSED (N=7 < 20)",
       "precision_at_05px": null,
       "precision_at_10px": null,
       "precision_at_20px": null,
@@ -133,22 +133,22 @@
       "true_p95_px": null
     },
     "mode_c_reillumination": {
-      "inlier_count": 2267,
+      "inlier_count": 932,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
+      "precision_at_05px": 0.9742489270386266,
+      "precision_at_10px": 0.9914163090128756,
       "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "true_rmse_px": 0.2002442330121994,
+      "true_median_px": 0.07431337982416153,
+      "true_p95_px": 0.3278573155403137
     }
   },
   {
     "delta_azimuth_deg": 180,
     "target_azimuth_deg": 225.0,
     "direct_optical": {
-      "inlier_count": 15,
-      "status": "SUPPRESSED (N=15 < 20)",
+      "inlier_count": 10,
+      "status": "SUPPRESSED (N=10 < 20)",
       "precision_at_05px": null,
       "precision_at_10px": null,
       "precision_at_20px": null,
@@ -157,14 +157,14 @@
       "true_p95_px": null
     },
     "mode_c_reillumination": {
-      "inlier_count": 1679,
+      "inlier_count": 742,
       "status": "VALID",
-      "precision_at_05px": 1.0,
-      "precision_at_10px": 1.0,
-      "precision_at_20px": 1.0,
-      "true_rmse_px": 0.0,
-      "true_median_px": 0.0,
-      "true_p95_px": 0.0
+      "precision_at_05px": 0.9784366576819407,
+      "precision_at_10px": 0.9905660377358491,
+      "precision_at_20px": 0.9919137466307277,
+      "true_rmse_px": 0.2793189287185669,
+      "true_median_px": 0.07243631780147552,
+      "true_p95_px": 0.33405184745788574
     }
   }
 ]
